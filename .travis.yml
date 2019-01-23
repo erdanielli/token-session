@@ -1,0 +1,8 @@
+language: java
+dist: trusty
+matrix:
+  include:
+    - jdk: oraclejdk8
+    - jdk: openjdk11
+script: ./mvnw clean verify
+
