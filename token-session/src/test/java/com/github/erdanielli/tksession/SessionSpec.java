@@ -66,4 +66,11 @@ abstract class SessionSpec {
         assertThat(session).hasMaxInactiveInterval(0);
     }
 
+    @Test
+    void shouldHaveId() {
+        Assertions.assertThat(session.getId())
+                .withFailMessage("Expected session's id to be a valid UUID")
+                .isEqualTo(session.getUUID().toString());
+    }
+
 }
