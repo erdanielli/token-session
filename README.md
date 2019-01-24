@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/erdanielli/token-session.png)](https://travis-ci.org/erdanielli/token-session)
+[![Build Status](https://travis-ci.com/erdanielli/token-session.svg?branch=master)](https://travis-ci.com/erdanielli/token-session)
 
 # token-session
 Transform you HttpSession into a HTTP token. Great for clusters!
