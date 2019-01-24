@@ -75,8 +75,7 @@ abstract class IncompleteSession extends Session {
     public final void setAttribute(String name, Object value) {
         if (value == null) {
             removeAttribute(name);
-        }
-        else {
+        } else {
             attributes.put(name, value);
         }
     }
