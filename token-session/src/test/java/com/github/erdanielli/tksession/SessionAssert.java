@@ -16,6 +16,7 @@ package com.github.erdanielli.tksession;
 import org.assertj.core.api.AbstractAssert;
 
 import javax.servlet.ServletContext;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,15 +39,48 @@ final class SessionAssert extends AbstractAssert<SessionAssert, Session> {
 
     SessionAssert isNew() {
         if (!actual.isNew()) {
-            failWithMessage("Expected a new session");
+            failWithMessage("Expected a brand new session");
         }
-        if (actual.getCreationTime() < 1L) {
-            failWithMessage("Required session's creation time is missing");
+        return this;
+    }
+
+    SessionAssert isNotNew() {
+        if (actual.isNew()) {
+            failWithMessage("Expected an existing session");
         }
-        if (actual.getLastAccessedTime() != actual.getCreationTime()) {
-            failWithMessage("Expected session's last accessed time to be equals to it's creation time");
+        return this;
+    }
+
+    SessionAssert wasCreatedInThePast() {
+        if (actual.getCreationTime() > System.currentTimeMillis()) {
+            failWithMessage("Expected session's creation time to be in the past but was '%s'",
+                    Instant.ofEpochMilli(actual.getCreationTime()));
         }
-        return hasMaxInactiveInterval(0);
+        return this;
+    }
+
+    SessionAssert wasCreatedAt(long expected) {
+        if (actual.getCreationTime() != expected) {
+            failWithMessage("Expected session's creation time to be '%s' but was '%s'",
+                    Instant.ofEpochMilli(expected), Instant.ofEpochMilli(actual.getCreationTime()));
+        }
+        return this;
+    }
+
+    SessionAssert wasLastAccessedInThePast() {
+        if (actual.getLastAccessedTime() > System.currentTimeMillis()) {
+            failWithMessage("Expected session's last accessed time to be in the past but was '%s'",
+                    Instant.ofEpochMilli(actual.getLastAccessedTime()));
+        }
+        return this;
+    }
+
+    SessionAssert wasLastAccessedAt(long expected) {
+        if (actual.getLastAccessedTime() != expected) {
+            failWithMessage("Expected session's last accessed time to be '%s' but was '%s'",
+                    Instant.ofEpochMilli(expected), Instant.ofEpochMilli(actual.getLastAccessedTime()));
+        }
+        return this;
     }
 
     SessionAssert hasNoAttributes() {
@@ -112,6 +146,20 @@ final class SessionAssert extends AbstractAssert<SessionAssert, Session> {
             }
         } catch (NullPointerException e) {
             failWithMessage("Required session id not present");
+        }
+        return this;
+    }
+
+    SessionAssert hasNotExpired() {
+        if (actual.expired()) {
+            failWithMessage("Not expecting an expired session");
+        }
+        return this;
+    }
+
+    SessionAssert hasExpired() {
+        if (!actual.expired()) {
+            failWithMessage("Expecting an expired session");
         }
         return this;
     }

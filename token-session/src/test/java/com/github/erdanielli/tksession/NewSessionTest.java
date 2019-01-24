@@ -15,29 +15,28 @@ package com.github.erdanielli.tksession;
 
 import org.junit.jupiter.api.Test;
 
+import javax.servlet.ServletContext;
+
 import static com.github.erdanielli.tksession.SessionAssert.assertThat;
 
 /**
  * @author erdanielli
  */
-class NewSessionTest extends SessionSpec {
+class NewSessionTest extends IncompleteSessionSpec {
 
     @Override
-    Session createSessionImplementation() {
-        return new NewSession(servletContext);
+    Session createSessionImplementation(ServletContext context) {
+        return new NewSession(context);
     }
 
     @Test
     void shouldBeNewAndEmpty() {
-        assertThat(session)
+        assertThat(session())
                 .isNew()
-                .hasServletContext(servletContext)
-                .hasNoAttributes();
-    }
-
-    @Test
-    void shouldNotSupportInvalidate() {
-        assertThat(session).cantInvalidate();
+                .wasLastAccessedAt(session().getCreationTime())
+                .hasMaxInactiveInterval(0)
+                .hasNoAttributes()
+                .hasNotExpired();
     }
 
 }

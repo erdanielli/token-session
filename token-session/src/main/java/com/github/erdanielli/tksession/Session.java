@@ -36,6 +36,13 @@ abstract class Session implements HttpSession {
                 .collect(Collectors.toMap(k -> k, this::getAttribute));
     }
 
+    final boolean expired() {
+        if (getMaxInactiveInterval() == 0) {
+            return false;
+        }
+        return System.currentTimeMillis() >= (getLastAccessedTime() + getMaxInactiveInterval() * 1_000);
+    }
+
     @Override
     public final String getId() {
         return getUUID().toString();

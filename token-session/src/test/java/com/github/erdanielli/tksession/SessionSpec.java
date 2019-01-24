@@ -14,11 +14,11 @@
 package com.github.erdanielli.tksession;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.servlet.ServletContext;
-import java.time.Instant;
 
 import static com.github.erdanielli.tksession.SessionAssert.assertThat;
 
@@ -26,22 +26,33 @@ import static com.github.erdanielli.tksession.SessionAssert.assertThat;
  * @author erdanielli
  */
 abstract class SessionSpec {
+    private ServletContext servletContext;
+    private Session session;
 
-    ServletContext servletContext = Mockito.mock(ServletContext.class);
+    abstract Session createSessionImplementation(ServletContext context);
 
-    Session session = createSessionImplementation();
+    @BeforeEach
+    private void createSession() {
+        servletContext = Mockito.mock(ServletContext.class);
+        session = createSessionImplementation(servletContext);
+    }
 
-    abstract Session createSessionImplementation();
+    final Session session() {
+        return session;
+    }
+
+    @Test
+    void shouldHaveContext() {
+        assertThat(session).hasServletContext(servletContext);
+    }
 
     @Test
     void shouldHaveConsistentCreationAndLastAccessedTimes() {
-        Assertions.assertThat(Instant.ofEpochMilli(session.getCreationTime()))
-                .withFailMessage("Expected session's creation time to be in the past")
-                .isBeforeOrEqualTo(Instant.now());
-
-        Assertions.assertThat(Instant.ofEpochMilli(session.getLastAccessedTime()))
-                .withFailMessage("Expected session's last accessed time to be after or equal its creation")
-                .isAfterOrEqualTo(Instant.ofEpochMilli(session.getCreationTime()));
+        assertThat(session).wasCreatedInThePast();
+        assertThat(session).wasLastAccessedInThePast();
+        Assertions.assertThat(session.getLastAccessedTime())
+                .withFailMessage("Session's last created time should not be less that it's creation time")
+                .isGreaterThanOrEqualTo(session.getCreationTime());
     }
 
     @Test
@@ -79,7 +90,7 @@ abstract class SessionSpec {
                 .isEqualTo("Deprecated");
         Assertions.assertThat(session.getValueNames())
                 .withFailMessage("session#getValueNames is broken")
-                .containsExactly("v_name");
+                .contains("v_name");
         session.removeValue("v_name");
         Assertions.assertThat(session.getValue("v_name"))
                 .withFailMessage("session#removeValue is broken")

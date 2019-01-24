@@ -13,31 +13,18 @@
  */
 package com.github.erdanielli.tksession;
 
-import javax.servlet.ServletContext;
-import java.util.HashMap;
-import java.util.UUID;
+import org.junit.jupiter.api.Test;
+
+import static com.github.erdanielli.tksession.SessionAssert.assertThat;
 
 /**
  * @author erdanielli
  */
-final class NewSession extends IncompleteSession {
+abstract class IncompleteSessionSpec extends SessionSpec {
 
-    NewSession(ServletContext sc) {
-        super(sc, UUID.randomUUID(), System.currentTimeMillis(), 0, new HashMap<>());
+    @Test
+    void shouldNotSupportInvalidate() {
+        assertThat(session()).cantInvalidate();
     }
 
-    @Override
-    public long getLastAccessedTime() {
-        return getCreationTime();
-    }
-
-    @Override
-    public boolean isNew() {
-        return true;
-    }
-
-    @Override
-    public void invalidate() {
-        throw new UnsupportedOperationException();
-    }
 }

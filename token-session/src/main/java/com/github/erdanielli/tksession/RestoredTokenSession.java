@@ -15,29 +15,33 @@ package com.github.erdanielli.tksession;
 
 import javax.servlet.ServletContext;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * @author erdanielli
  */
-final class NewSession extends IncompleteSession {
+final class RestoredTokenSession extends IncompleteSession {
+    private final long lastAccessedTime;
 
-    NewSession(ServletContext sc) {
-        super(sc, UUID.randomUUID(), System.currentTimeMillis(), 0, new HashMap<>());
+    RestoredTokenSession(ServletContext sc, UUID uuid, long creationTime, long lastAccessedTime, int maxInactiveTimeout,
+            Map<String, Object> attributes) {
+        super(sc, uuid, creationTime, maxInactiveTimeout, new HashMap<>(attributes));
+        this.lastAccessedTime = lastAccessedTime;
     }
 
     @Override
     public long getLastAccessedTime() {
-        return getCreationTime();
-    }
-
-    @Override
-    public boolean isNew() {
-        return true;
+        return lastAccessedTime;
     }
 
     @Override
     public void invalidate() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isNew() {
+        return false;
     }
 }

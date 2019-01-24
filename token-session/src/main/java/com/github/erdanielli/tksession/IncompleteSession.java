@@ -29,11 +29,13 @@ abstract class IncompleteSession extends Session {
     private final Map<String, Object> attributes;
     private int maxInactiveInterval;
 
-    IncompleteSession(ServletContext sc, UUID uuid, long creationTime, Map<String, Object> attributes) {
+    IncompleteSession(ServletContext sc, UUID uuid, long creationTime, int maxInactiveInterval,
+            Map<String, Object> attributes) {
         this.sc = sc;
         this.uuid = uuid;
         this.creationTime = creationTime;
         this.attributes = attributes;
+        setMaxInactiveInterval(maxInactiveInterval);
     }
 
     @Override
