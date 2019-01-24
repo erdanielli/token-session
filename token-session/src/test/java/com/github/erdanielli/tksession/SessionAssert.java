@@ -40,9 +40,6 @@ final class SessionAssert extends AbstractAssert<SessionAssert, Session> {
         if (!actual.isNew()) {
             failWithMessage("Expected a new session");
         }
-        if (actual.getUUID() == null) {
-            failWithMessage("Required session's uuid is missing");
-        }
         if (actual.getCreationTime() < 1L) {
             failWithMessage("Required session's creation time is missing");
         }
@@ -104,6 +101,17 @@ final class SessionAssert extends AbstractAssert<SessionAssert, Session> {
             failWithMessage("Session should not support invalidation");
         } catch (UnsupportedOperationException e) {
             // NOP
+        }
+        return this;
+    }
+
+    SessionAssert hasValidId() {
+        try {
+            if (!Objects.equals(actual.getId(), actual.getUUID().toString())) {
+                failWithMessage("Session id should be a valid UUID, got '%s'", actual.getId());
+            }
+        } catch (NullPointerException e) {
+            failWithMessage("Required session id not present");
         }
         return this;
     }

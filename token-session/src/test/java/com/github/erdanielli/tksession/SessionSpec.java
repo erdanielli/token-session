@@ -67,10 +67,26 @@ abstract class SessionSpec {
     }
 
     @Test
-    void shouldHaveId() {
-        Assertions.assertThat(session.getId())
-                .withFailMessage("Expected session's id to be a valid UUID")
-                .isEqualTo(session.getUUID().toString());
+    void shouldHaveIdCompatibleWithUUID() {
+        assertThat(session).hasValidId();
+    }
+
+    @Test
+    void shouldSupportDeprecatedApi() {
+        session.putValue("v_name", "Deprecated");
+        Assertions.assertThat(session.getValue("v_name"))
+                .withFailMessage("session#getValue is broken")
+                .isEqualTo("Deprecated");
+        Assertions.assertThat(session.getValueNames())
+                .withFailMessage("session#getValueNames is broken")
+                .containsExactly("v_name");
+        session.removeValue("v_name");
+        Assertions.assertThat(session.getValue("v_name"))
+                .withFailMessage("session#removeValue is broken")
+                .isNull();
+        Assertions.assertThatThrownBy(() -> session.getSessionContext())
+                .withFailMessage("session#getSessionContext should not be supported")
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 
 }
