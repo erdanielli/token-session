@@ -4,8 +4,9 @@ matrix:
   include:
     - jdk: oraclejdk8
     - jdk: openjdk11
-script: ./mvnw clean verify
+script: ./mvnw clean verify -Pci
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - python <(curl -s https://raw.githubusercontent.com/TouK/sputnik-ci/master/sputnik-ci.py)
+  - bash <(curl -s https://codecov.io/bash)
 
