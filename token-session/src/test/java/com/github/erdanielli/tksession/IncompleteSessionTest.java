@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.fail;
 /**
  * @author erdanielli
  */
-class IncompleteSessionSpec {
+class IncompleteSessionTest {
     private Session newSession = new NewSession();
     private Session restoredTokenSession = new RestoredTokenSession(UUID.randomUUID(), 0L, 0L, 0, emptyMap());
     private Session invalidatedSession = new InvalidatedSession(newSession);
