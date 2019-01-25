@@ -50,7 +50,7 @@ public final class SpecCompleteSession extends Session {
     // already implemented
 
     @Override
-    UUID getUUID() {
+    public UUID getUUID() {
         return incomplete.getUUID();
     }
 

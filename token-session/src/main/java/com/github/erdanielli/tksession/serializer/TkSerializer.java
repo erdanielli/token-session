@@ -11,27 +11,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.erdanielli.tksession;
+package com.github.erdanielli.tksession.serializer;
 
-import java.util.HashMap;
-import java.util.UUID;
+import com.github.erdanielli.tksession.Session;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author erdanielli
  */
-public final class NewSession extends IncompleteSession {
+public interface TkSerializer {
 
-    public NewSession() {
-        super(UUID.randomUUID(), System.currentTimeMillis(), 0, new HashMap<>());
-    }
+    void write(Session session, OutputStream out);
 
-    @Override
-    public long getLastAccessedTime() {
-        return getCreationTime();
-    }
+    Session read(InputStream in);
 
-    @Override
-    public boolean isNew() {
-        return true;
-    }
 }

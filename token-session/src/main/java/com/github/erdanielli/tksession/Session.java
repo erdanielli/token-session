@@ -27,16 +27,16 @@ import java.util.stream.Collectors;
  */
 
 @SuppressWarnings("deprecation")
-abstract class Session implements HttpSession {
+public abstract class Session implements HttpSession {
 
-    abstract UUID getUUID();
+    public abstract UUID getUUID();
 
-    final Map<String, Object> attributes() {
-        return Collections.list(getAttributeNames()).stream()
-                .collect(Collectors.toMap(k -> k, this::getAttribute));
+    public final Map<String, Object> attributes() {
+        return Collections.unmodifiableMap(Collections.list(getAttributeNames()).stream()
+                .collect(Collectors.toMap(k -> k, this::getAttribute)));
     }
 
-    final boolean expired() {
+    public final boolean expired() {
         if (getMaxInactiveInterval() == 0) {
             return false;
         }

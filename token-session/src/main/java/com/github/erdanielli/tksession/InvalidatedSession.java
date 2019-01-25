@@ -30,7 +30,7 @@ final class InvalidatedSession extends Session {
     // methods allowed after invalidation
 
     @Override
-    UUID getUUID() {
+    public UUID getUUID() {
         return original.getUUID();
     }
 

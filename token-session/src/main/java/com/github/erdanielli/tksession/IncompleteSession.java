@@ -37,7 +37,7 @@ abstract class IncompleteSession extends Session {
     }
 
     @Override
-    protected final UUID getUUID() {
+    public final UUID getUUID() {
         return uuid;
     }
 

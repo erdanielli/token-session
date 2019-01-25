@@ -20,10 +20,10 @@ import java.util.UUID;
 /**
  * @author erdanielli
  */
-final class RestoredTokenSession extends IncompleteSession {
+public final class RestoredTokenSession extends IncompleteSession {
     private final long lastAccessedTime;
 
-    RestoredTokenSession(UUID uuid, long creationTime, long lastAccessedTime, int maxInactiveTimeout,
+    public RestoredTokenSession(UUID uuid, long creationTime, long lastAccessedTime, int maxInactiveTimeout,
             Map<String, Object> attributes) {
         super(uuid, creationTime, maxInactiveTimeout, new HashMap<>(attributes));
         this.lastAccessedTime = lastAccessedTime;
