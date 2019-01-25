@@ -45,7 +45,7 @@ abstract class TkSerializerSpec {
     }
 
     private void doTest(Session expected) {
-        assertEquality(writeThenRead(expected), expected);
+        assertEquals(writeThenRead(expected), expected);
     }
 
     private Session writeThenRead(Session session) {
@@ -55,7 +55,7 @@ abstract class TkSerializerSpec {
         return serializer.read(bytes.input());
     }
 
-    private void assertEquality(Session actual, Session expected) {
+    final void assertEquals(Session actual, Session expected) {
         assertThat(actual.getId()).isEqualTo(expected.getId());
         assertThat(actual.getCreationTime()).isEqualTo(expected.getCreationTime());
         assertThat(actual.getLastAccessedTime()).isEqualTo(expected.getLastAccessedTime());
