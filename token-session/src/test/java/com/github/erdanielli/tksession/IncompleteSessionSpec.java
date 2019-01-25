@@ -15,16 +15,38 @@ package com.github.erdanielli.tksession;
 
 import org.junit.jupiter.api.Test;
 
-import static com.github.erdanielli.tksession.SessionAssert.assertThat;
+import java.util.UUID;
+
+import static java.util.Collections.emptyMap;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author erdanielli
  */
-abstract class IncompleteSessionSpec extends SessionSpec {
+class IncompleteSessionSpec {
+    private Session newSession = new NewSession();
+    private Session restoredTokenSession = new RestoredTokenSession(UUID.randomUUID(), 0L, 0L, 0, emptyMap());
+    private Session invalidatedSession = new InvalidatedSession(newSession);
 
     @Test
     void shouldNotSupportInvalidate() {
-        assertThat(session()).cantInvalidate();
+        shouldNotSupport(newSession::invalidate, "NewSession#invalidate");
+        shouldNotSupport(restoredTokenSession::invalidate, "RestoredTokenSessionn#invalidate");
     }
 
+    @Test
+    void shouldNotProvideServletContext() {
+        shouldNotSupport(newSession::getServletContext, "NewSession#getServletContext");
+        shouldNotSupport(restoredTokenSession::getServletContext, "RestoredTokenSession#getServletContext");
+        shouldNotSupport(invalidatedSession::getServletContext, "InvalidatedSession#getServletContext");
+    }
+
+    private void shouldNotSupport(Runnable fn, String method) {
+        try {
+            fn.run();
+            fail(method + " should not be supported");
+        } catch (UnsupportedOperationException e) {
+            // SUCCESS
+        }
+    }
 }

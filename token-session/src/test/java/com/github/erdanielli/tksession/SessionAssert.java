@@ -129,16 +129,6 @@ final class SessionAssert extends AbstractAssert<SessionAssert, Session> {
         return this;
     }
 
-    SessionAssert cantInvalidate() {
-        try {
-            actual.invalidate();
-            failWithMessage("Session should not support invalidation");
-        } catch (UnsupportedOperationException e) {
-            // NOP
-        }
-        return this;
-    }
-
     SessionAssert hasValidId() {
         try {
             if (!Objects.equals(actual.getId(), actual.getUUID().toString())) {

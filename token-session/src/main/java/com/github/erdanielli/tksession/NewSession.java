@@ -13,7 +13,6 @@
  */
 package com.github.erdanielli.tksession;
 
-import javax.servlet.ServletContext;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -22,8 +21,8 @@ import java.util.UUID;
  */
 final class NewSession extends IncompleteSession {
 
-    NewSession(ServletContext sc) {
-        super(sc, UUID.randomUUID(), System.currentTimeMillis(), 0, new HashMap<>());
+    NewSession() {
+        super(UUID.randomUUID(), System.currentTimeMillis(), 0, new HashMap<>());
     }
 
     @Override
@@ -34,10 +33,5 @@ final class NewSession extends IncompleteSession {
     @Override
     public boolean isNew() {
         return true;
-    }
-
-    @Override
-    public void invalidate() {
-        throw new UnsupportedOperationException();
     }
 }

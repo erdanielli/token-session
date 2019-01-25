@@ -23,24 +23,17 @@ import java.util.UUID;
  * @author erdanielli
  */
 abstract class IncompleteSession extends Session {
-    private final ServletContext sc;
     private final UUID uuid;
     private final long creationTime;
     private final Map<String, Object> attributes;
     private int maxInactiveInterval;
 
-    IncompleteSession(ServletContext sc, UUID uuid, long creationTime, int maxInactiveInterval,
+    IncompleteSession(UUID uuid, long creationTime, int maxInactiveInterval,
             Map<String, Object> attributes) {
-        this.sc = sc;
         this.uuid = uuid;
         this.creationTime = creationTime;
         this.attributes = attributes;
         setMaxInactiveInterval(maxInactiveInterval);
-    }
-
-    @Override
-    public final ServletContext getServletContext() {
-        return sc;
     }
 
     @Override
@@ -86,4 +79,17 @@ abstract class IncompleteSession extends Session {
     public final void removeAttribute(String name) {
         attributes.remove(name);
     }
+
+    // unsupported API
+
+    @Override
+    public final ServletContext getServletContext() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public final void invalidate() {
+        throw new UnsupportedOperationException();
+    }
+
 }

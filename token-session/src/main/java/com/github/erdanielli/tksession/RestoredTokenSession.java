@@ -13,7 +13,6 @@
  */
 package com.github.erdanielli.tksession;
 
-import javax.servlet.ServletContext;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -24,20 +23,15 @@ import java.util.UUID;
 final class RestoredTokenSession extends IncompleteSession {
     private final long lastAccessedTime;
 
-    RestoredTokenSession(ServletContext sc, UUID uuid, long creationTime, long lastAccessedTime, int maxInactiveTimeout,
+    RestoredTokenSession(UUID uuid, long creationTime, long lastAccessedTime, int maxInactiveTimeout,
             Map<String, Object> attributes) {
-        super(sc, uuid, creationTime, maxInactiveTimeout, new HashMap<>(attributes));
+        super(uuid, creationTime, maxInactiveTimeout, new HashMap<>(attributes));
         this.lastAccessedTime = lastAccessedTime;
     }
 
     @Override
     public long getLastAccessedTime() {
         return lastAccessedTime;
-    }
-
-    @Override
-    public void invalidate() {
-        throw new UnsupportedOperationException();
     }
 
     @Override
