@@ -18,8 +18,6 @@ import com.github.erdanielli.tksession.Session;
 import java.io.*;
 import java.util.Base64;
 
-import static java.util.Base64.getEncoder;
-
 /**
  * @author erdanielli
  */
@@ -38,8 +36,8 @@ public final class TkBase64Serializer extends TkInMemorySerializer {
      * @throws IOException if the token is invalid
      */
     public Session readToken(String base64Token) throws IOException {
-        try (final InputStream input = new ByteArrayInputStream(Base64.getDecoder().decode(base64Token))) {
-            return next.read(input);
+        try (final InputStream decodedInput = decode(base64Token)) {
+            return next.read(decodedInput);
         } catch (UncheckedIOException e) {
             throw e.getCause();
         }
@@ -52,15 +50,13 @@ public final class TkBase64Serializer extends TkInMemorySerializer {
      * @return a base64 encoded token representation of the session
      */
     public String writeToken(Session session) {
-        final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        next.write(session, output);
-        return getEncoder().encodeToString(output.toByteArray());
+        return encodeToString(forwardWrite(session, next));
     }
 
     @Override
     protected Session read(byte[] token) {
-        try (final InputStream input = new ByteArrayInputStream(Base64.getDecoder().decode(token))) {
-            return next.read(input);
+        try (final InputStream decodedInput = decode(token)) {
+            return next.read(decodedInput);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -74,12 +70,26 @@ public final class TkBase64Serializer extends TkInMemorySerializer {
      */
     @Override
     public void write(Session session, OutputStream out) {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        next.write(session, baos);
         try {
-            out.write(getEncoder().encode(baos.toByteArray()));
+            out.write(encode(forwardWrite(session, next)));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    private InputStream decode(String base64Token) {
+        return new ByteArrayInputStream(Base64.getDecoder().decode(base64Token));
+    }
+
+    private InputStream decode(byte[] base64Token) {
+        return new ByteArrayInputStream(Base64.getDecoder().decode(base64Token));
+    }
+
+    private byte[] encode(byte[] binaryContent) {
+        return Base64.getEncoder().encode(binaryContent);
+    }
+
+    private String encodeToString(byte[] binaryContent) {
+        return Base64.getEncoder().encodeToString(binaryContent);
     }
 }

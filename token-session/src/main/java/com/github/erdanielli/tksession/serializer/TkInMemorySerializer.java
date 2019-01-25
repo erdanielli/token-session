@@ -46,4 +46,10 @@ public abstract class TkInMemorySerializer implements TkSerializer {
             throw new UncheckedIOException(e);
         }
     }
+
+    protected final byte[] forwardWrite(Session session, TkSerializer next) {
+        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        next.write(session, output);
+        return output.toByteArray();
+    }
 }
