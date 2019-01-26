@@ -29,6 +29,12 @@
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
                         <version>0.8.3</version>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/AesCrypto.*</exclude>
+                                <exclude>**/SuppressedExceptions.*</exclude>
+                            </excludes>
+                        </configuration>
                         <executions>
                             <execution>
                                 <goals>

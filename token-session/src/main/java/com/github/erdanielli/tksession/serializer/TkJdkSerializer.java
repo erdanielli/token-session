@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.github.erdanielli.tksession.serializer.SuppressedExceptions.readObject;
+
 /**
  * @author erdanielli
  */
@@ -84,14 +86,10 @@ public final class TkJdkSerializer implements TkSerializer {
             return Collections.emptyMap();
         }
         final Map<String, Object> m = new HashMap<>(size);
-        try {
-            for (int i = 0; i < size; i++) {
-                final String key = (String) input.readObject();
-                m.put(key, input.readObject());
-            }
-            return m;
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Could not deserialize session attributes", e);
+        for (int i = 0; i < size; i++) {
+            final String key = readObject(input);
+            m.put(key, readObject(input));
         }
+        return m;
     }
 }
