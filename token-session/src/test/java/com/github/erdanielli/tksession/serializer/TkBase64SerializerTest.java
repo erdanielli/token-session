@@ -19,7 +19,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +36,7 @@ class TkBase64SerializerTest extends TkSerializerSpec {
     }
 
     @Test
-    void shouldWriteAndReadString() throws IOException {
+    void shouldWriteAndReadString() {
         final Session session = new NewSession();
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         serializer.write(session, out);
@@ -48,6 +48,6 @@ class TkBase64SerializerTest extends TkSerializerSpec {
     @Test
     void shouldFailOnInvalidToken() {
         Assertions.assertThatThrownBy(() -> serializer.readToken("ASDF"))
-                .isInstanceOf(IOException.class);
+                .isInstanceOf(UncheckedIOException.class);
     }
 }

@@ -18,14 +18,14 @@ import com.github.erdanielli.tksession.RestoredTokenSession;
 import com.github.erdanielli.tksession.Session;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
+import static com.github.erdanielli.tksession.serializer.BrokenStream.brokenInput;
+import static com.github.erdanielli.tksession.serializer.BrokenStream.brokenOutput;
 import static java.util.Collections.singletonMap;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author erdanielli
@@ -44,6 +44,21 @@ abstract class TkSerializerSpec {
         doTest(new RestoredTokenSession(randomUUID(), 1L, 2L, 3, singletonMap("foo", "Bar")));
     }
 
+    @Test
+    void shouldRethrowUnexpectedExceptions() {
+        final TkSerializer serializer = createTkSerializer();
+        assertUncheckedIOExceptionOnRead(serializer::read);
+        assertUncheckedIOExceptionOnWrite(output -> serializer.write(new NewSession(), output));
+    }
+
+    final void assertEquals(Session actual, Session expected) {
+        assertThat(actual.getId()).isEqualTo(expected.getId());
+        assertThat(actual.getCreationTime()).isEqualTo(expected.getCreationTime());
+        assertThat(actual.getLastAccessedTime()).isEqualTo(expected.getLastAccessedTime());
+        assertThat(actual.getMaxInactiveInterval()).isEqualTo(expected.getMaxInactiveInterval());
+        assertThat(actual.attributes()).containsAllEntriesOf(expected.attributes());
+    }
+
     private void doTest(Session expected) {
         assertEquals(writeThenRead(expected), expected);
     }
@@ -55,12 +70,22 @@ abstract class TkSerializerSpec {
         return serializer.read(bytes.input());
     }
 
-    final void assertEquals(Session actual, Session expected) {
-        assertThat(actual.getId()).isEqualTo(expected.getId());
-        assertThat(actual.getCreationTime()).isEqualTo(expected.getCreationTime());
-        assertThat(actual.getLastAccessedTime()).isEqualTo(expected.getLastAccessedTime());
-        assertThat(actual.getMaxInactiveInterval()).isEqualTo(expected.getMaxInactiveInterval());
-        assertThat(actual.attributes()).containsAllEntriesOf(expected.attributes());
+    final void assertUncheckedIOExceptionOnRead(CheckedConsumer<InputStream> action) {
+        assertUncheckedIOException(brokenInput(), action);
+    }
+
+    final void assertUncheckedIOExceptionOnWrite(CheckedConsumer<OutputStream> action) {
+        assertUncheckedIOException(brokenOutput(), action);
+    }
+
+    private <T> void assertUncheckedIOException(T value, CheckedConsumer<T> action) {
+        try {
+            action.accept(value);
+        } catch (UncheckedIOException | IOException e) {
+            // OK
+        } catch (Exception e) {
+            fail("should fail with some IOException, got '%s'", e.getClass().getName());
+        }
     }
 
     private static class Bytes {
@@ -74,5 +99,10 @@ abstract class TkSerializerSpec {
         InputStream input() {
             return new ByteArrayInputStream(output.toByteArray());
         }
+    }
+
+    @FunctionalInterface
+    interface CheckedConsumer<T> {
+        void accept(T value) throws Exception;
     }
 }

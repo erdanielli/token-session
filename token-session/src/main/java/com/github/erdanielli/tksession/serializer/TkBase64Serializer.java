@@ -33,14 +33,9 @@ public final class TkBase64Serializer extends TkInMemorySerializer {
      *
      * @param base64Token Header value from request
      * @return A restored session
-     * @throws IOException if the token is invalid
      */
-    public Session readToken(String base64Token) throws IOException {
-        try (final InputStream decodedInput = decode(base64Token)) {
-            return next.read(decodedInput);
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
-        }
+    public Session readToken(String base64Token) {
+        return next.read(decode(base64Token));
     }
 
     /**
@@ -55,11 +50,7 @@ public final class TkBase64Serializer extends TkInMemorySerializer {
 
     @Override
     protected Session read(byte[] token) {
-        try (final InputStream decodedInput = decode(token)) {
-            return next.read(decodedInput);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return next.read(decode(token));
     }
 
     /**
