@@ -51,26 +51,10 @@ final class SessionAssert extends AbstractAssert<SessionAssert, Session> {
         return this;
     }
 
-    SessionAssert wasCreatedInThePast() {
-        if (actual.getCreationTime() > System.currentTimeMillis()) {
-            failWithMessage("Expected session's creation time to be in the past but was '%s'",
-                    Instant.ofEpochMilli(actual.getCreationTime()));
-        }
-        return this;
-    }
-
     SessionAssert wasCreatedAt(long expected) {
         if (actual.getCreationTime() != expected) {
             failWithMessage("Expected session's creation time to be '%s' but was '%s'",
                     Instant.ofEpochMilli(expected), Instant.ofEpochMilli(actual.getCreationTime()));
-        }
-        return this;
-    }
-
-    SessionAssert wasLastAccessedInThePast() {
-        if (actual.getLastAccessedTime() > System.currentTimeMillis()) {
-            failWithMessage("Expected session's last accessed time to be in the past but was '%s'",
-                    Instant.ofEpochMilli(actual.getLastAccessedTime()));
         }
         return this;
     }
@@ -130,12 +114,8 @@ final class SessionAssert extends AbstractAssert<SessionAssert, Session> {
     }
 
     SessionAssert hasValidId() {
-        try {
-            if (!Objects.equals(actual.getId(), actual.getUUID().toString())) {
-                failWithMessage("Session id should be a valid UUID, got '%s'", actual.getId());
-            }
-        } catch (NullPointerException e) {
-            failWithMessage("Required session id not present");
+        if (!Objects.equals(actual.getId(), actual.getUUID().toString())) {
+            failWithMessage("Session id should be a valid UUID, got '%s'", actual.getId());
         }
         return this;
     }

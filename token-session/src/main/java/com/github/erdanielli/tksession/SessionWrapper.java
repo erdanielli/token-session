@@ -20,6 +20,7 @@ import java.util.UUID;
 /**
  * @author erdanielli
  */
+@SuppressWarnings("DesignForExtensionCheck")
 public abstract class SessionWrapper extends Session {
     private final Session original;
 

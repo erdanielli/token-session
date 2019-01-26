@@ -44,7 +44,7 @@ final class AesCrypto {
         try {
             return new ByteArrayInputStream(initCipher(DECRYPT_MODE).doFinal(encryptedInput));
         } catch (BadPaddingException | IllegalBlockSizeException e) {
-            throw new IllegalArgumentException("AES decryption failed");
+            throw new IllegalArgumentException("AES decryption failed", e);
         }
     }
 
@@ -52,7 +52,7 @@ final class AesCrypto {
         try {
             return initCipher(ENCRYPT_MODE).doFinal(plainInput);
         } catch (BadPaddingException | IllegalBlockSizeException e) {
-            throw new IllegalArgumentException("AES encryption failed");
+            throw new IllegalArgumentException("AES encryption failed", e);
         }
     }
 

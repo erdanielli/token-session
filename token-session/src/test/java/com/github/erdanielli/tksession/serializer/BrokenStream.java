@@ -22,6 +22,9 @@ import java.io.OutputStream;
  */
 final class BrokenStream {
 
+    private BrokenStream() {
+    }
+
     static InputStream brokenInput() {
         return new InputStream() {
             @Override

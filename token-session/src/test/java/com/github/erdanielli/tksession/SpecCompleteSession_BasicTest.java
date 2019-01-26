@@ -28,10 +28,10 @@ import static org.mockito.Mockito.mock;
  */
 class SpecCompleteSession_BasicTest {
     private ServletContext sc = mock(ServletContext.class);
-    private UUID ID = UUID.randomUUID();
+    private UUID uuid = UUID.randomUUID();
     private long tenSecondsAgo = System.currentTimeMillis() - 10_000L;
     private Session session = new SpecCompleteSession(sc,
-            new RestoredTokenSession(ID, tenSecondsAgo, tenSecondsAgo, 1, singletonMap("foo", "Bar")));
+            new RestoredTokenSession(uuid, tenSecondsAgo, tenSecondsAgo, 1, singletonMap("foo", "Bar")));
     private Session newSession = new SpecCompleteSession(sc, new NewSession());
 
     @Test
@@ -59,7 +59,7 @@ class SpecCompleteSession_BasicTest {
     void shouldHaveIdCompatibleWithUUID() {
         assertThat(newSession).hasValidId();
         assertThat(session).hasValidId();
-        Assertions.assertThat(session.getId()).isEqualTo(ID.toString());
+        Assertions.assertThat(session.getId()).isEqualTo(uuid.toString());
     }
 
     @Test
