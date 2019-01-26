@@ -20,83 +20,70 @@ import java.util.UUID;
 /**
  * @author erdanielli
  */
-public final class SpecCompleteSession extends Session {
-    private final ServletContext sc;
-    private Session incomplete;
-    private boolean invalidated;
+public abstract class SessionWrapper extends Session {
+    private final Session original;
 
-    public SpecCompleteSession(ServletContext sc, Session incomplete) {
-        this.sc = sc;
-        this.incomplete = incomplete;
+    protected SessionWrapper(Session original) {
+        this.original = original;
     }
-
-    // remaining spec impl
-
-    @Override
-    public ServletContext getServletContext() {
-        return sc;
-    }
-
-    @Override
-    public void invalidate() {
-        if (!invalidated) {
-            incomplete.invalidate();
-            incomplete = new InvalidatedSession(incomplete);
-            invalidated = true;
-        } else {
-            incomplete.invalidate();
-        }
-    }
-
-    // already implemented
 
     @Override
     public UUID getUUID() {
-        return incomplete.getUUID();
+        return original.getUUID();
     }
 
     @Override
     public long getCreationTime() {
-        return incomplete.getCreationTime();
+        return original.getCreationTime();
     }
 
     @Override
     public long getLastAccessedTime() {
-        return incomplete.getLastAccessedTime();
+        return original.getLastAccessedTime();
+    }
+
+    @Override
+    public ServletContext getServletContext() {
+        return original.getServletContext();
     }
 
     @Override
     public void setMaxInactiveInterval(int interval) {
-        incomplete.setMaxInactiveInterval(interval);
+        original.setMaxInactiveInterval(interval);
     }
 
     @Override
     public int getMaxInactiveInterval() {
-        return incomplete.getMaxInactiveInterval();
+        return original.getMaxInactiveInterval();
     }
 
     @Override
     public Object getAttribute(String name) {
-        return incomplete.getAttribute(name);
+        return original.getAttribute(name);
     }
 
     @Override
     public Enumeration<String> getAttributeNames() {
-        return incomplete.getAttributeNames();
+        return original.getAttributeNames();
     }
 
     @Override
     public void setAttribute(String name, Object value) {
-        incomplete.setAttribute(name, value);
+        original.setAttribute(name, value);
     }
 
     @Override
     public void removeAttribute(String name) {
-        incomplete.removeAttribute(name);
+        original.removeAttribute(name);
+    }
+
+    @Override
+    public void invalidate() {
+        original.invalidate();
     }
 
     @Override
     public boolean isNew() {
-        return incomplete.isNew();
+        return original.isNew();
     }
 }

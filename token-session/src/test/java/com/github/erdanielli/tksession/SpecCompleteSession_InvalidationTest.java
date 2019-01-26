@@ -13,6 +13,8 @@
  */
 package com.github.erdanielli.tksession;
 
+import com.github.erdanielli.tksession.listener.SessionListenerNotifier;
+import com.github.erdanielli.tksession.listener.SessionListenerNotifierBuilder;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +27,9 @@ import static org.mockito.Mockito.mock;
  * @author erdanielli
  */
 class SpecCompleteSession_InvalidationTest {
-    private Session session = new SpecCompleteSession(mock(ServletContext.class), new NewSession());
+    private SessionListenerNotifier notifier = new SessionListenerNotifierBuilder().build();
+    private Session session = new SpecCompleteSession(mock(ServletContext.class),
+            notifier.observe(new NewSession()));
 
     @Test
     void allowedMethodsAfterInvalidation() {

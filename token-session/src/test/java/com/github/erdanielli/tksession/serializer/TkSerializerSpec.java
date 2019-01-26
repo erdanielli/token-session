@@ -16,8 +16,12 @@ package com.github.erdanielli.tksession.serializer;
 import com.github.erdanielli.tksession.NewSession;
 import com.github.erdanielli.tksession.RestoredTokenSession;
 import com.github.erdanielli.tksession.Session;
+import com.github.erdanielli.tksession.SpecCompleteSession;
+import com.github.erdanielli.tksession.listener.SessionListenerNotifier;
+import com.github.erdanielli.tksession.listener.SessionListenerNotifierBuilder;
 import org.junit.jupiter.api.Test;
 
+import javax.servlet.ServletContext;
 import java.io.*;
 
 import static com.github.erdanielli.tksession.serializer.BrokenStream.brokenInput;
@@ -26,29 +30,33 @@ import static java.util.Collections.singletonMap;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author erdanielli
  */
 abstract class TkSerializerSpec {
+    private SessionListenerNotifier notifier = new SessionListenerNotifierBuilder().build();
 
     abstract TkSerializer createTkSerializer();
 
     @Test
     void shouldSupportNewSessions() {
-        doTest(new NewSession());
+        doTest(newSession());
     }
 
     @Test
     void shouldSupportRestoredSession() {
-        doTest(new RestoredTokenSession(randomUUID(), 1L, 2L, 3, singletonMap("foo", "Bar")));
+        final Session session = new SpecCompleteSession(mock(ServletContext.class), notifier.observe(
+                new RestoredTokenSession(randomUUID(), 1L, 2L, 3, singletonMap("foo", "Bar"))));
+        doTest(session);
     }
 
     @Test
     void shouldRethrowUnexpectedExceptions() {
         final TkSerializer serializer = createTkSerializer();
         assertUncheckedIOExceptionOnRead(serializer::read);
-        assertUncheckedIOExceptionOnWrite(output -> serializer.write(new NewSession(), output));
+        assertUncheckedIOExceptionOnWrite(output -> serializer.write(newSession(), output));
     }
 
     final void assertEquals(Session actual, Session expected) {
@@ -57,6 +65,10 @@ abstract class TkSerializerSpec {
         assertThat(actual.getLastAccessedTime()).isEqualTo(expected.getLastAccessedTime());
         assertThat(actual.getMaxInactiveInterval()).isEqualTo(expected.getMaxInactiveInterval());
         assertThat(actual.attributes()).containsAllEntriesOf(expected.attributes());
+    }
+
+    private Session newSession() {
+        return new SpecCompleteSession(mock(ServletContext.class), notifier.observe(new NewSession()));
     }
 
     private void doTest(Session expected) {

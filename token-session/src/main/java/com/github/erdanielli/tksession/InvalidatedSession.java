@@ -13,40 +13,15 @@
  */
 package com.github.erdanielli.tksession;
 
-import javax.servlet.ServletContext;
 import java.util.Enumeration;
-import java.util.UUID;
 
 /**
  * @author erdanielli
  */
-final class InvalidatedSession extends Session {
-    private final Session original;
+final class InvalidatedSession extends SessionWrapper {
 
     InvalidatedSession(Session original) {
-        this.original = original;
-    }
-
-    // methods allowed after invalidation
-
-    @Override
-    public UUID getUUID() {
-        return original.getUUID();
-    }
-
-    @Override
-    public ServletContext getServletContext() {
-        return original.getServletContext();
-    }
-
-    @Override
-    public void setMaxInactiveInterval(int interval) {
-        original.setMaxInactiveInterval(interval);
-    }
-
-    @Override
-    public int getMaxInactiveInterval() {
-        return original.getMaxInactiveInterval();
+        super(original);
     }
 
     // methods not allowed after invalidation
