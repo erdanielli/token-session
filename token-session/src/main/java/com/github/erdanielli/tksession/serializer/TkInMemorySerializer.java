@@ -20,36 +20,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 public abstract class TkInMemorySerializer implements TkSerializer {
-    private static final int BUFFER_SIZE = 1024;
+  private static final int BUFFER_SIZE = 1024;
 
-    @Override
-    public final Session read(InputStream in) {
-        return read(toByteArray(in));
+  @Override
+  public final Session read(InputStream in) {
+    return read(toByteArray(in));
+  }
+
+  protected abstract Session read(byte[] token);
+
+  private byte[] toByteArray(InputStream in) {
+    try {
+      final ByteArrayOutputStream out = new ByteArrayOutputStream(BUFFER_SIZE);
+      final byte[] buffer = new byte[BUFFER_SIZE];
+      int bytesRead;
+      while ((bytesRead = in.read(buffer)) != -1) {
+        out.write(buffer, 0, bytesRead);
+      }
+      return out.toByteArray();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
-
-    protected abstract Session read(byte[] token);
-
-    private byte[] toByteArray(InputStream in) {
-        try {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(BUFFER_SIZE);
-            final byte[] buffer = new byte[BUFFER_SIZE];
-            int bytesRead;
-            while ((bytesRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
-            }
-            return out.toByteArray();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    protected final byte[] forwardWrite(Session session, TkSerializer next) {
-        final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        next.write(session, output);
-        return output.toByteArray();
-    }
+  }
 }

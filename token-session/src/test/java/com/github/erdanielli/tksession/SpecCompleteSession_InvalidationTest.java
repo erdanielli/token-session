@@ -23,40 +23,39 @@ import javax.servlet.ServletContext;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 class SpecCompleteSession_InvalidationTest {
-    private SessionListenerNotifier notifier = new SessionListenerNotifierBuilder().build();
-    private Session session = new SpecCompleteSession(mock(ServletContext.class),
-            notifier.observe(new NewSession()));
+  private SessionListenerNotifier notifier = new SessionListenerNotifierBuilder().build();
+  private Session session =
+      new SpecCompleteSession(mock(ServletContext.class), notifier.observe(new NewSession()));
 
-    @Test
-    void allowedMethodsAfterInvalidation() {
-        session.invalidate();
-        session.getId();
-        session.setMaxInactiveInterval(10);
-        session.getMaxInactiveInterval();
-        session.getServletContext();
-    }
+  @Test
+  void allowedMethodsAfterInvalidation() {
+    session.invalidate();
+    session.getId();
+    session.setMaxInactiveInterval(10);
+    session.getMaxInactiveInterval();
+    session.getServletContext();
+  }
 
-    @Test
-    void forbiddenMethodsAfterInvalidation() {
-        session.invalidate();
-        shouldThrow(session::getCreationTime, "getCreationTime");
-        shouldThrow(session::getLastAccessedTime, "getLastAccessedTime");
-        shouldThrow(() -> session.getAttribute("attr"), "getAttribute(String)");
-        shouldThrow(session::getAttributeNames, "getAttributeNames");
-        shouldThrow(() -> session.setAttribute("name", 1), "setAttribute(String,Object)");
-        shouldThrow(() -> session.removeAttribute("name"), "removeAttribute(String)");
-        shouldThrow(session::invalidate, "invalidate");
-        shouldThrow(session::isNew, "isNew");
-    }
+  @Test
+  void forbiddenMethodsAfterInvalidation() {
+    session.invalidate();
+    shouldThrow(session::getCreationTime, "getCreationTime");
+    shouldThrow(session::getLastAccessedTime, "getLastAccessedTime");
+    shouldThrow(() -> session.getAttribute("attr"), "getAttribute(String)");
+    shouldThrow(session::getAttributeNames, "getAttributeNames");
+    shouldThrow(() -> session.setAttribute("name", 1), "setAttribute(String,Object)");
+    shouldThrow(() -> session.removeAttribute("name"), "removeAttribute(String)");
+    shouldThrow(session::invalidate, "invalidate");
+    shouldThrow(session::isNew, "isNew");
+  }
 
-    private void shouldThrow(ThrowableAssert.ThrowingCallable fn, String m) {
-        assertThatThrownBy(fn)
-                .withFailMessage("SpecCompleteSession#%s should throw an IllegalStateException after invalidation", m)
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("session was invalidated");
-    }
+  private void shouldThrow(ThrowableAssert.ThrowingCallable fn, String m) {
+    assertThatThrownBy(fn)
+        .withFailMessage(
+            "SpecCompleteSession#%s should throw an IllegalStateException after invalidation", m)
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("session was invalidated");
+  }
 }

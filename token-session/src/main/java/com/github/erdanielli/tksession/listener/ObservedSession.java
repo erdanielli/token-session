@@ -16,44 +16,42 @@ package com.github.erdanielli.tksession.listener;
 import com.github.erdanielli.tksession.Session;
 import com.github.erdanielli.tksession.SessionWrapper;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 final class ObservedSession extends SessionWrapper {
-    private final SessionListenerNotifier notifier;
+  private final SessionListenerNotifier notifier;
 
-    ObservedSession(SessionListenerNotifier notifier, Session original) {
-        super(original);
-        this.notifier = notifier;
-        if (isNew()) {
-            this.notifier.sessionCreated(this);
-        }
+  ObservedSession(SessionListenerNotifier notifier, Session original) {
+    super(original);
+    this.notifier = notifier;
+    if (isNew()) {
+      this.notifier.sessionCreated(this);
     }
+  }
 
-    @Override
-    public void setAttribute(String name, Object value) {
-        if (value == null) {
-            removeAttribute(name);
-        } else {
-            final Object prev = getAttribute(name);
-            super.setAttribute(name, value);
-            if (prev == null) {
-                notifier.attributeAdded(this, name, value);
-            } else {
-                notifier.attributeReplaced(this, name, prev, value);
-            }
-        }
+  @Override
+  public void setAttribute(String name, Object value) {
+    if (value == null) {
+      removeAttribute(name);
+    } else {
+      final Object prev = getAttribute(name);
+      super.setAttribute(name, value);
+      if (prev == null) {
+        notifier.attributeAdded(this, name, value);
+      } else {
+        notifier.attributeReplaced(this, name, prev, value);
+      }
     }
+  }
 
-    @Override
-    public void removeAttribute(String name) {
-        final Object prevValue = getAttribute(name);
-        super.removeAttribute(name);
-        notifier.attributeRemoved(this, name, prevValue);
-    }
+  @Override
+  public void removeAttribute(String name) {
+    final Object prevValue = getAttribute(name);
+    super.removeAttribute(name);
+    notifier.attributeRemoved(this, name, prevValue);
+  }
 
-    @Override
-    public void invalidate() {
-        notifier.sessionDestroyed(this);
-    }
+  @Override
+  public void invalidate() {
+    notifier.sessionDestroyed(this);
+  }
 }

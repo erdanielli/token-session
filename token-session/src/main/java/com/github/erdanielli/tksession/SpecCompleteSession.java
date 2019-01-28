@@ -17,86 +17,85 @@ import javax.servlet.ServletContext;
 import java.util.Enumeration;
 import java.util.UUID;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 public final class SpecCompleteSession extends Session {
-    private final ServletContext sc;
-    private Session incomplete;
-    private boolean invalidated;
+  private final ServletContext sc;
+  private Session incomplete;
+  private boolean invalidated;
 
-    public SpecCompleteSession(ServletContext sc, Session incomplete) {
-        this.sc = sc;
-        this.incomplete = incomplete;
+  public SpecCompleteSession(ServletContext sc, Session incomplete) {
+    this.sc = sc;
+    this.incomplete = incomplete;
+  }
+
+  // remaining spec impl
+
+  @Override
+  public ServletContext getServletContext() {
+    return sc;
+  }
+
+  @Override
+  public void invalidate() {
+    if (!invalidated) {
+      incomplete.invalidate();
+      incomplete = new InvalidatedSession(incomplete);
+      invalidated = true;
+    } else {
+      incomplete.invalidate();
     }
+  }
 
-    // remaining spec impl
+  // already implemented
 
-    @Override
-    public ServletContext getServletContext() {
-        return sc;
-    }
+  @Override
+  public UUID getUUID() {
+    return incomplete.getUUID();
+  }
 
-    @Override
-    public void invalidate() {
-        if (!invalidated) {
-            incomplete.invalidate();
-            incomplete = new InvalidatedSession(incomplete);
-            invalidated = true;
-        } else {
-            incomplete.invalidate();
-        }
-    }
+  @Override
+  public long getCreationTime() {
+    return incomplete.getCreationTime();
+  }
 
-    // already implemented
+  @Override
+  public long getLastAccessedTime() {
+    return incomplete.getLastAccessedTime();
+  }
 
-    @Override
-    public UUID getUUID() {
-        return incomplete.getUUID();
-    }
+  @Override
+  public void setMaxInactiveInterval(int interval) {
+    incomplete.setMaxInactiveInterval(interval);
+  }
 
-    @Override
-    public long getCreationTime() {
-        return incomplete.getCreationTime();
-    }
+  @Override
+  public int getMaxInactiveInterval() {
+    return incomplete.getMaxInactiveInterval();
+  }
 
-    @Override
-    public long getLastAccessedTime() {
-        return incomplete.getLastAccessedTime();
-    }
+  @Override
+  public Object getAttribute(String name) {
+    return incomplete.getAttribute(name);
+  }
 
-    @Override
-    public void setMaxInactiveInterval(int interval) {
-        incomplete.setMaxInactiveInterval(interval);
-    }
+  @Override
+  public Enumeration<String> getAttributeNames() {
+    return incomplete.getAttributeNames();
+  }
 
-    @Override
-    public int getMaxInactiveInterval() {
-        return incomplete.getMaxInactiveInterval();
-    }
+  @Override
+  @SuppressWarnings("squid:S2441")
+  public void setAttribute(String name, Object value) {
+    incomplete.setAttribute(name, value);
+  }
 
-    @Override
-    public Object getAttribute(String name) {
-        return incomplete.getAttribute(name);
-    }
+  @Override
+  public void removeAttribute(String name) {
+    incomplete.removeAttribute(name);
+  }
 
-    @Override
-    public Enumeration<String> getAttributeNames() {
-        return incomplete.getAttributeNames();
-    }
-
-    @Override
-    public void setAttribute(String name, Object value) {
-        incomplete.setAttribute(name, value);
-    }
-
-    @Override
-    public void removeAttribute(String name) {
-        incomplete.removeAttribute(name);
-    }
-
-    @Override
-    public boolean isNew() {
-        return incomplete.isNew();
-    }
+  @Override
+  public boolean isNew() {
+    return incomplete.isNew();
+  }
 }

@@ -19,77 +19,74 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 abstract class IncompleteSession extends Session {
-    private final UUID uuid;
-    private final long creationTime;
-    private final Map<String, Object> attributes;
-    private int maxInactiveInterval;
+  private final UUID uuid;
+  private final long creationTime;
+  private final Map<String, Object> attributes;
+  private int maxInactiveInterval;
 
-    IncompleteSession(UUID uuid, long creationTime, int maxInactiveInterval,
-            Map<String, Object> attributes) {
-        this.uuid = uuid;
-        this.creationTime = creationTime;
-        this.attributes = attributes;
-        setMaxInactiveInterval(maxInactiveInterval);
+  IncompleteSession(
+      UUID uuid, long creationTime, int maxInactiveInterval, Map<String, Object> attributes) {
+    this.uuid = uuid;
+    this.creationTime = creationTime;
+    this.attributes = attributes;
+    setMaxInactiveInterval(maxInactiveInterval);
+  }
+
+  @Override
+  public final UUID getUUID() {
+    return uuid;
+  }
+
+  @Override
+  public final long getCreationTime() {
+    return this.creationTime;
+  }
+
+  @Override
+  public final void setMaxInactiveInterval(int interval) {
+    maxInactiveInterval = Math.max(0, interval);
+  }
+
+  @Override
+  public final int getMaxInactiveInterval() {
+    return maxInactiveInterval;
+  }
+
+  @Override
+  public final Object getAttribute(String name) {
+    return attributes.get(name);
+  }
+
+  @Override
+  public final Enumeration<String> getAttributeNames() {
+    return Collections.enumeration(attributes.keySet());
+  }
+
+  @Override
+  public final void setAttribute(String name, Object value) {
+    if (value == null) {
+      removeAttribute(name);
+    } else {
+      attributes.put(name, value);
     }
+  }
 
-    @Override
-    public final UUID getUUID() {
-        return uuid;
-    }
+  @Override
+  public final void removeAttribute(String name) {
+    attributes.remove(name);
+  }
 
-    @Override
-    public final long getCreationTime() {
-        return this.creationTime;
-    }
+  // unsupported API
 
-    @Override
-    public final void setMaxInactiveInterval(int interval) {
-        maxInactiveInterval = Math.max(0, interval);
-    }
+  @Override
+  public final ServletContext getServletContext() {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public final int getMaxInactiveInterval() {
-        return maxInactiveInterval;
-    }
-
-    @Override
-    public final Object getAttribute(String name) {
-        return attributes.get(name);
-    }
-
-    @Override
-    public final Enumeration<String> getAttributeNames() {
-        return Collections.enumeration(attributes.keySet());
-    }
-
-    @Override
-    public final void setAttribute(String name, Object value) {
-        if (value == null) {
-            removeAttribute(name);
-        } else {
-            attributes.put(name, value);
-        }
-    }
-
-    @Override
-    public final void removeAttribute(String name) {
-        attributes.remove(name);
-    }
-
-    // unsupported API
-
-    @Override
-    public final ServletContext getServletContext() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public final void invalidate() {
-        throw new UnsupportedOperationException();
-    }
-
+  @Override
+  public final void invalidate() {
+    throw new UnsupportedOperationException();
+  }
 }

@@ -19,33 +19,30 @@ import javax.servlet.http.HttpSessionListener;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 final class LifecycleNotifier implements SessionListenerNotifier {
-    private final List<HttpSessionListener> listeners;
+  private final List<HttpSessionListener> listeners;
 
-    static SessionListenerNotifier combine(List<HttpSessionListener> list) {
-        return list.isEmpty() ? NULL : new LifecycleNotifier(list);
-    }
+  static SessionListenerNotifier combine(List<HttpSessionListener> list) {
+    return list.isEmpty() ? null : new LifecycleNotifier(list);
+  }
 
-    private LifecycleNotifier(List<HttpSessionListener> listeners) {
-        this.listeners = listeners;
-    }
+  private LifecycleNotifier(List<HttpSessionListener> listeners) {
+    this.listeners = listeners;
+  }
 
-    @Override
-    public void sessionCreated(HttpSession s) {
-        notify(new HttpSessionEvent(s), HttpSessionListener::sessionCreated);
-    }
+  @Override
+  public void sessionCreated(HttpSession s) {
+    notify(new HttpSessionEvent(s), HttpSessionListener::sessionCreated);
+  }
 
-    @Override
-    public void sessionDestroyed(HttpSession s) {
-        notify(new HttpSessionEvent(s), HttpSessionListener::sessionDestroyed);
-    }
+  @Override
+  public void sessionDestroyed(HttpSession s) {
+    notify(new HttpSessionEvent(s), HttpSessionListener::sessionDestroyed);
+  }
 
-    private void notify(HttpSessionEvent event,
-            BiConsumer<HttpSessionListener, HttpSessionEvent> cn) {
-        listeners.forEach(it -> cn.accept(it, event));
-    }
-
+  private void notify(
+      HttpSessionEvent event, BiConsumer<HttpSessionListener, HttpSessionEvent> cn) {
+    listeners.forEach(it -> cn.accept(it, event));
+  }
 }

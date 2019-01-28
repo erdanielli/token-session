@@ -23,50 +23,50 @@ import static com.github.erdanielli.tksession.SessionAssert.assertThat;
 import static java.util.Collections.singletonMap;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 class SpecCompleteSession_BasicTest {
-    private ServletContext sc = mock(ServletContext.class);
-    private UUID uuid = UUID.randomUUID();
-    private long tenSecondsAgo = System.currentTimeMillis() - 10_000L;
-    private Session session = new SpecCompleteSession(sc,
-            new RestoredTokenSession(uuid, tenSecondsAgo, tenSecondsAgo, 1, singletonMap("foo", "Bar")));
-    private Session newSession = new SpecCompleteSession(sc, new NewSession());
+  private ServletContext sc = mock(ServletContext.class);
+  private UUID uuid = UUID.randomUUID();
+  private long tenSecondsAgo = System.currentTimeMillis() - 10_000L;
+  private Session session =
+      new SpecCompleteSession(
+          sc,
+          new RestoredTokenSession(
+              uuid, tenSecondsAgo, tenSecondsAgo, 1, singletonMap("foo", "Bar")));
+  private Session newSession = new SpecCompleteSession(sc, new NewSession());
 
-    @Test
-    void shouldSupportNewSessions() {
-        assertThat(newSession)
-                .isNew()
-                .wasLastAccessedAt(newSession.getCreationTime())
-                .hasMaxInactiveInterval(0)
-                .hasNoAttributes()
-                .hasServletContext(sc);
-    }
+  @Test
+  void shouldSupportNewSessions() {
+    assertThat(newSession)
+        .isNew()
+        .wasLastAccessedAt(newSession.getCreationTime())
+        .hasMaxInactiveInterval(0)
+        .hasNoAttributes()
+        .hasServletContext(sc);
+  }
 
-    @Test
-    void shouldSupportRestoredSessions() {
-        assertThat(session)
-                .isNotNew()
-                .wasCreatedAt(tenSecondsAgo)
-                .wasLastAccessedAt(tenSecondsAgo)
-                .hasMaxInactiveInterval(1)
-                .hasAttributes("foo", "Bar")
-                .hasServletContext(sc);
-    }
+  @Test
+  void shouldSupportRestoredSessions() {
+    assertThat(session)
+        .isNotNew()
+        .wasCreatedAt(tenSecondsAgo)
+        .wasLastAccessedAt(tenSecondsAgo)
+        .hasMaxInactiveInterval(1)
+        .hasAttributes("foo", "Bar")
+        .hasServletContext(sc);
+  }
 
-    @Test
-    void shouldHaveIdCompatibleWithUUID() {
-        assertThat(newSession).hasValidId();
-        assertThat(session).hasValidId();
-        Assertions.assertThat(session.getId()).isEqualTo(uuid.toString());
-    }
+  @Test
+  void shouldHaveIdCompatibleWithUUID() {
+    assertThat(newSession).hasValidId();
+    assertThat(session).hasValidId();
+    Assertions.assertThat(session.getId()).isEqualTo(uuid.toString());
+  }
 
-    @Test
-    void shouldNotSupportDeprecatedApi() {
-        Assertions.assertThatThrownBy(() -> session.getSessionContext())
-                .withFailMessage("session#getSessionContext should not be supported")
-                .isInstanceOf(UnsupportedOperationException.class);
-    }
-
+  @Test
+  void shouldNotSupportDeprecatedApi() {
+    Assertions.assertThatThrownBy(() -> session.getSessionContext())
+        .withFailMessage("session#getSessionContext should not be supported")
+        .isInstanceOf(UnsupportedOperationException.class);
+  }
 }

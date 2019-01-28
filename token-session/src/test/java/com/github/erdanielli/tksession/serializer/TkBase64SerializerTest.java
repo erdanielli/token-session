@@ -24,30 +24,28 @@ import java.io.UncheckedIOException;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 class TkBase64SerializerTest extends TkSerializerSpec {
-    private TkBase64Serializer serializer = new TkBase64Serializer(new TkJdkSerializer());
+  private TkBase64Serializer serializer = new TkBase64Serializer(new TkJdkSerializer());
 
-    @Override
-    TkSerializer createTkSerializer() {
-        return serializer;
-    }
+  @Override
+  TkSerializer createTkSerializer() {
+    return serializer;
+  }
 
-    @Test
-    void shouldWriteAndReadString() {
-        final Session session = new NewSession();
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        serializer.write(session, out);
-        final String tokenString = serializer.writeToken(session);
-        assertThat(tokenString).isEqualTo(new String(out.toByteArray(), ISO_8859_1));
-        assertEquals(serializer.readToken(tokenString), session);
-    }
+  @Test
+  void shouldWriteAndReadString() {
+    final Session session = new NewSession();
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    serializer.write(session, out);
+    final String tokenString = serializer.writeToken(session);
+    assertThat(tokenString).isEqualTo(new String(out.toByteArray(), ISO_8859_1));
+    assertEquals(serializer.readToken(tokenString), session);
+  }
 
-    @Test
-    void shouldFailOnInvalidToken() {
-        Assertions.assertThatThrownBy(() -> serializer.readToken("ASDF"))
-                .isInstanceOf(UncheckedIOException.class);
-    }
+  @Test
+  void shouldFailOnInvalidToken() {
+    Assertions.assertThatThrownBy(() -> serializer.readToken("ASDF"))
+        .isInstanceOf(UncheckedIOException.class);
+  }
 }

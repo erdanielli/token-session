@@ -16,22 +16,20 @@ package com.github.erdanielli.tksession;
 import java.util.HashMap;
 import java.util.UUID;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 public final class NewSession extends IncompleteSession {
 
-    public NewSession() {
-        super(UUID.randomUUID(), System.currentTimeMillis(), 0, new HashMap<>());
-    }
+  public NewSession() {
+    super(UUID.randomUUID(), System.currentTimeMillis(), 0, new HashMap<>());
+  }
 
-    @Override
-    public long getLastAccessedTime() {
-        return getCreationTime();
-    }
+  @Override
+  public long getLastAccessedTime() {
+    return getCreationTime();
+  }
 
-    @Override
-    public boolean isNew() {
-        return true;
-    }
+  @Override
+  public boolean isNew() {
+    return true;
+  }
 }

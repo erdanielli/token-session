@@ -18,30 +18,26 @@ import javax.servlet.http.HttpSessionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 public final class SessionListenerNotifierBuilder {
-    private final List<HttpSessionListener> sListeners = new ArrayList<>();
-    private final List<HttpSessionAttributeListener> attrListeners = new ArrayList<>();
+  private final List<HttpSessionListener> sListeners = new ArrayList<>();
+  private final List<HttpSessionAttributeListener> attrListeners = new ArrayList<>();
 
-    public SessionListenerNotifierBuilder add(HttpSessionListener listener) {
-        return addTo(sListeners, listener);
-    }
+  public SessionListenerNotifierBuilder add(HttpSessionListener listener) {
+    return addTo(sListeners, listener);
+  }
 
-    public SessionListenerNotifierBuilder add(HttpSessionAttributeListener listener) {
-        return addTo(attrListeners, listener);
-    }
+  public SessionListenerNotifierBuilder add(HttpSessionAttributeListener listener) {
+    return addTo(attrListeners, listener);
+  }
 
-    public SessionListenerNotifier build() {
-        return AllNotifiers.combine(
-                LifecycleNotifier.combine(sListeners),
-                AttributesNotifier.combine(attrListeners));
-    }
+  public SessionListenerNotifier build() {
+    return AllNotifiers.combine(
+        LifecycleNotifier.combine(sListeners), AttributesNotifier.combine(attrListeners));
+  }
 
-    private <T> SessionListenerNotifierBuilder addTo(List<T> destination, T listener) {
-        destination.add(listener);
-        return this;
-    }
-
+  private <T> SessionListenerNotifierBuilder addTo(List<T> destination, T listener) {
+    destination.add(listener);
+    return this;
+  }
 }

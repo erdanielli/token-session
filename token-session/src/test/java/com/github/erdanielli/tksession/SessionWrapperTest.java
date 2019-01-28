@@ -23,22 +23,18 @@ import javax.servlet.ServletContext;
 import static com.github.erdanielli.tksession.SessionAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 class SessionWrapperTest {
 
-    @Test
-    void shouldDelegateAllMethods() {
-        final SessionListenerNotifier notifier = new SessionListenerNotifierBuilder().build();
-        final ServletContext sc = Mockito.mock(ServletContext.class);
-        final Session session = new SpecCompleteSession(sc, notifier.observe(new NewSession()));
-        final Session wrapper = new SessionWrapper(session) {};
+  @Test
+  void shouldDelegateAllMethods() {
+    final SessionListenerNotifier notifier = new SessionListenerNotifierBuilder().build();
+    final ServletContext sc = Mockito.mock(ServletContext.class);
+    final Session session = new SpecCompleteSession(sc, notifier.observe(new NewSession()));
+    final Session wrapper = new SessionWrapper(session) {};
 
-        assertThat(wrapper).hasServletContext(sc);
-        wrapper.invalidate();
-        assertThatThrownBy(wrapper::invalidate)
-                .isInstanceOf(IllegalStateException.class);
-    }
-
+    assertThat(wrapper).hasServletContext(sc);
+    wrapper.invalidate();
+    assertThatThrownBy(wrapper::invalidate).isInstanceOf(IllegalStateException.class);
+  }
 }

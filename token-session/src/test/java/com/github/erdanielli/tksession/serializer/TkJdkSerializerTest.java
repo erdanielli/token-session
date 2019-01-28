@@ -13,13 +13,11 @@
  */
 package com.github.erdanielli.tksession.serializer;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 class TkJdkSerializerTest extends TkSerializerSpec {
 
-    @Override
-    TkSerializer createTkSerializer() {
-        return new TkJdkSerializer();
-    }
+  @Override
+  TkSerializer createTkSerializer() {
+    return new TkJdkSerializer();
+  }
 }

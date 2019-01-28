@@ -15,59 +15,56 @@ package com.github.erdanielli.tksession;
 
 import java.util.Enumeration;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 final class InvalidatedSession extends SessionWrapper {
 
-    InvalidatedSession(Session original) {
-        super(original);
-    }
+  InvalidatedSession(Session original) {
+    super(original);
+  }
 
-    // methods not allowed after invalidation
+  // methods not allowed after invalidation
 
-    @Override
-    public long getCreationTime() {
-        throw invalidatedException();
-    }
+  @Override
+  public long getCreationTime() {
+    throw invalidatedException();
+  }
 
-    @Override
-    public long getLastAccessedTime() {
-        throw invalidatedException();
-    }
+  @Override
+  public long getLastAccessedTime() {
+    throw invalidatedException();
+  }
 
-    @Override
-    public Object getAttribute(String name) {
-        throw invalidatedException();
-    }
+  @Override
+  public Object getAttribute(String name) {
+    throw invalidatedException();
+  }
 
-    @Override
-    public Enumeration<String> getAttributeNames() {
-        throw invalidatedException();
-    }
+  @Override
+  public Enumeration<String> getAttributeNames() {
+    throw invalidatedException();
+  }
 
-    @Override
-    public void setAttribute(String name, Object value) {
-        throw invalidatedException();
-    }
+  @Override
+  public void setAttribute(String name, Object value) {
+    throw invalidatedException();
+  }
 
-    @Override
-    public void removeAttribute(String name) {
-        throw invalidatedException();
-    }
+  @Override
+  public void removeAttribute(String name) {
+    throw invalidatedException();
+  }
 
-    @Override
-    public void invalidate() {
-        throw invalidatedException();
-    }
+  @Override
+  public void invalidate() {
+    throw invalidatedException();
+  }
 
-    @Override
-    public boolean isNew() {
-        throw invalidatedException();
-    }
+  @Override
+  public boolean isNew() {
+    throw invalidatedException();
+  }
 
-    private IllegalStateException invalidatedException() {
-        return new IllegalStateException("session was invalidated");
-    }
-
+  private IllegalStateException invalidatedException() {
+    return new IllegalStateException("session was invalidated");
+  }
 }

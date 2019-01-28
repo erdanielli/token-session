@@ -20,33 +20,33 @@ import java.util.UUID;
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.fail;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 class IncompleteSessionTest {
-    private Session newSession = new NewSession();
-    private Session restoredTokenSession = new RestoredTokenSession(UUID.randomUUID(), 0L, 0L, 0, emptyMap());
-    private Session invalidatedSession = new InvalidatedSession(newSession);
+  private Session newSession = new NewSession();
+  private Session restoredTokenSession =
+      new RestoredTokenSession(UUID.randomUUID(), 0L, 0L, 0, emptyMap());
+  private Session invalidatedSession = new InvalidatedSession(newSession);
 
-    @Test
-    void shouldNotSupportInvalidate() {
-        shouldNotSupport(newSession::invalidate, "NewSession#invalidate");
-        shouldNotSupport(restoredTokenSession::invalidate, "RestoredTokenSessionn#invalidate");
-    }
+  @Test
+  void shouldNotSupportInvalidate() {
+    shouldNotSupport(newSession::invalidate, "NewSession#invalidate");
+    shouldNotSupport(restoredTokenSession::invalidate, "RestoredTokenSessionn#invalidate");
+  }
 
-    @Test
-    void shouldNotProvideServletContext() {
-        shouldNotSupport(newSession::getServletContext, "NewSession#getServletContext");
-        shouldNotSupport(restoredTokenSession::getServletContext, "RestoredTokenSession#getServletContext");
-        shouldNotSupport(invalidatedSession::getServletContext, "InvalidatedSession#getServletContext");
-    }
+  @Test
+  void shouldNotProvideServletContext() {
+    shouldNotSupport(newSession::getServletContext, "NewSession#getServletContext");
+    shouldNotSupport(
+        restoredTokenSession::getServletContext, "RestoredTokenSession#getServletContext");
+    shouldNotSupport(invalidatedSession::getServletContext, "InvalidatedSession#getServletContext");
+  }
 
-    private void shouldNotSupport(Runnable fn, String method) {
-        try {
-            fn.run();
-            fail(method + " should not be supported");
-        } catch (UnsupportedOperationException e) {
-            // SUCCESS
-        }
+  private void shouldNotSupport(Runnable fn, String method) {
+    try {
+      fn.run();
+      fail(method + " should not be supported");
+    } catch (UnsupportedOperationException e) {
+      // SUCCESS
     }
+  }
 }

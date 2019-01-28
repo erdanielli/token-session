@@ -17,25 +17,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 public final class RestoredTokenSession extends IncompleteSession {
-    private final long lastAccessedTime;
+  private final long lastAccessedTime;
 
-    public RestoredTokenSession(UUID uuid, long creationTime, long lastAccessedTime, int maxInactiveTimeout,
-            Map<String, Object> attributes) {
-        super(uuid, creationTime, maxInactiveTimeout, new HashMap<>(attributes));
-        this.lastAccessedTime = lastAccessedTime;
-    }
+  public RestoredTokenSession(
+      UUID uuid,
+      long creationTime,
+      long lastAccessedTime,
+      int maxInactiveTimeout,
+      Map<String, Object> attributes) {
+    super(uuid, creationTime, maxInactiveTimeout, new HashMap<>(attributes));
+    this.lastAccessedTime = lastAccessedTime;
+  }
 
-    @Override
-    public long getLastAccessedTime() {
-        return lastAccessedTime;
-    }
+  @Override
+  public long getLastAccessedTime() {
+    return lastAccessedTime;
+  }
 
-    @Override
-    public boolean isNew() {
-        return false;
-    }
+  @Override
+  public boolean isNew() {
+    return false;
+  }
 }

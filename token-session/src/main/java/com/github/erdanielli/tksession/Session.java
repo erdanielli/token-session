@@ -25,48 +25,49 @@ import java.util.stream.Collectors;
  *
  * @author erdanielli
  */
-
-@SuppressWarnings("deprecation")
 public abstract class Session implements HttpSession {
 
-    public abstract UUID getUUID();
+  public abstract UUID getUUID();
 
-    public final Map<String, Object> attributes() {
-        return Collections.unmodifiableMap(Collections.list(getAttributeNames()).stream()
-                .collect(Collectors.toMap(k -> k, this::getAttribute)));
+  public final Map<String, Object> attributes() {
+    return Collections.unmodifiableMap(
+        Collections.list(getAttributeNames()).stream()
+            .collect(Collectors.toMap(k -> k, this::getAttribute)));
+  }
+
+  public final boolean expired() {
+    if (getMaxInactiveInterval() == 0) {
+      return false;
     }
+    return System.currentTimeMillis() >= (getLastAccessedTime() + getMaxInactiveInterval() * 1_000);
+  }
 
-    public final boolean expired() {
-        if (getMaxInactiveInterval() == 0) {
-            return false;
-        }
-        return System.currentTimeMillis() >= (getLastAccessedTime() + getMaxInactiveInterval() * 1_000);
-    }
+  @Override
+  public final String getId() {
+    return getUUID().toString();
+  }
 
-    @Override
-    public final String getId() {
-        return getUUID().toString();
-    }
+  // deprecated methods
 
-    // deprecated methods
+  @SuppressWarnings({"squid:CallToDeprecatedMethod", "deprecation"})
+  public final HttpSessionContext getSessionContext() {
+    throw new UnsupportedOperationException();
+  }
 
-    public final HttpSessionContext getSessionContext() {
-        throw new UnsupportedOperationException();
-    }
+  public final Object getValue(String name) {
+    return getAttribute(name);
+  }
 
-    public final Object getValue(String name) {
-        return getAttribute(name);
-    }
+  public final String[] getValueNames() {
+    return Collections.list(getAttributeNames()).toArray(new String[0]);
+  }
 
-    public final String[] getValueNames() {
-        return Collections.list(getAttributeNames()).toArray(new String[0]);
-    }
+  @SuppressWarnings("squid:S2441")
+  public final void putValue(String name, Object value) {
+    setAttribute(name, value);
+  }
 
-    public final void putValue(String name, Object value) {
-        setAttribute(name, value);
-    }
-
-    public final void removeValue(String name) {
-        removeAttribute(name);
-    }
+  public final void removeValue(String name) {
+    removeAttribute(name);
+  }
 }

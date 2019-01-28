@@ -17,74 +17,73 @@ import javax.servlet.ServletContext;
 import java.util.Enumeration;
 import java.util.UUID;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 @SuppressWarnings("DesignForExtensionCheck")
 public abstract class SessionWrapper extends Session {
-    private final Session original;
+  private final Session original;
 
-    protected SessionWrapper(Session original) {
-        this.original = original;
-    }
+  protected SessionWrapper(Session original) {
+    this.original = original;
+  }
 
-    @Override
-    public UUID getUUID() {
-        return original.getUUID();
-    }
+  @Override
+  public UUID getUUID() {
+    return original.getUUID();
+  }
 
-    @Override
-    public long getCreationTime() {
-        return original.getCreationTime();
-    }
+  @Override
+  public long getCreationTime() {
+    return original.getCreationTime();
+  }
 
-    @Override
-    public long getLastAccessedTime() {
-        return original.getLastAccessedTime();
-    }
+  @Override
+  public long getLastAccessedTime() {
+    return original.getLastAccessedTime();
+  }
 
-    @Override
-    public ServletContext getServletContext() {
-        return original.getServletContext();
-    }
+  @Override
+  public ServletContext getServletContext() {
+    return original.getServletContext();
+  }
 
-    @Override
-    public void setMaxInactiveInterval(int interval) {
-        original.setMaxInactiveInterval(interval);
-    }
+  @Override
+  public void setMaxInactiveInterval(int interval) {
+    original.setMaxInactiveInterval(interval);
+  }
 
-    @Override
-    public int getMaxInactiveInterval() {
-        return original.getMaxInactiveInterval();
-    }
+  @Override
+  public int getMaxInactiveInterval() {
+    return original.getMaxInactiveInterval();
+  }
 
-    @Override
-    public Object getAttribute(String name) {
-        return original.getAttribute(name);
-    }
+  @Override
+  public Object getAttribute(String name) {
+    return original.getAttribute(name);
+  }
 
-    @Override
-    public Enumeration<String> getAttributeNames() {
-        return original.getAttributeNames();
-    }
+  @Override
+  public Enumeration<String> getAttributeNames() {
+    return original.getAttributeNames();
+  }
 
-    @Override
-    public void setAttribute(String name, Object value) {
-        original.setAttribute(name, value);
-    }
+  @Override
+  @SuppressWarnings("squid:S2441")
+  public void setAttribute(String name, Object value) {
+    original.setAttribute(name, value);
+  }
 
-    @Override
-    public void removeAttribute(String name) {
-        original.removeAttribute(name);
-    }
+  @Override
+  public void removeAttribute(String name) {
+    original.removeAttribute(name);
+  }
 
-    @Override
-    public void invalidate() {
-        original.invalidate();
-    }
+  @Override
+  public void invalidate() {
+    original.invalidate();
+  }
 
-    @Override
-    public boolean isNew() {
-        return original.isNew();
-    }
+  @Override
+  public boolean isNew() {
+    return original.isNew();
+  }
 }

@@ -19,29 +19,27 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 public final class TkAesSerializer extends TkInMemorySerializer {
-    private final AesCrypto aes;
-    private final TkSerializer original;
+  private final AesCrypto aes;
+  private final TkSerializer original;
 
-    public TkAesSerializer(String plainSecret, TkSerializer next) {
-        this.original = next;
-        this.aes = new AesCrypto(plainSecret);
-    }
+  public TkAesSerializer(String plainSecret, TkSerializer next) {
+    this.original = next;
+    this.aes = new AesCrypto(plainSecret);
+  }
 
-    @Override
-    protected Session read(byte[] token) {
-        return original.read(aes.decrypt(token));
-    }
+  @Override
+  protected Session read(byte[] token) {
+    return original.read(aes.decrypt(token));
+  }
 
-    @Override
-    public void write(Session session, OutputStream out) {
-        try {
-            out.write(aes.encrypt(forwardWrite(session, original)));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+  @Override
+  public void write(Session session, OutputStream out) {
+    try {
+      out.write(aes.encrypt(forwardWrite(session, original)));
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
+  }
 }

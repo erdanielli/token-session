@@ -13,51 +13,58 @@
  */
 package com.github.erdanielli.tksession.listener;
 
+import com.github.erdanielli.tksession.Session;
+
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 final class AllNotifiers implements SessionListenerNotifier {
-    private final List<SessionListenerNotifier> notifiers;
+  private static final SessionListenerNotifier NULL =
+      new SessionListenerNotifier() {
+        @Override
+        public Session observe(Session session) {
+          return new UnobservedSession(session);
+        }
+      };
+  private final List<SessionListenerNotifier> notifiers;
 
-    static SessionListenerNotifier combine(SessionListenerNotifier... instances) {
-        final List<SessionListenerNotifier> list = Stream.of(instances)
-                .filter(s -> s != NULL)
-                .collect(Collectors.toList());
+  static SessionListenerNotifier combine(SessionListenerNotifier... instances) {
+    final List<SessionListenerNotifier> list =
+        Stream.of(instances).filter(Objects::nonNull).collect(Collectors.toList());
 
-        return list.isEmpty() ? NULL : new AllNotifiers(list);
-    }
+    return list.isEmpty() ? NULL : new AllNotifiers(list);
+  }
 
-    private AllNotifiers(List<SessionListenerNotifier> notifiers) {
-        this.notifiers = notifiers;
-    }
+  private AllNotifiers(List<SessionListenerNotifier> notifiers) {
+    this.notifiers = notifiers;
+  }
 
-    @Override
-    public void sessionCreated(HttpSession s) {
-        notifiers.forEach(it -> it.sessionCreated(s));
-    }
+  @Override
+  public void sessionCreated(HttpSession s) {
+    notifiers.forEach(it -> it.sessionCreated(s));
+  }
 
-    @Override
-    public void sessionDestroyed(HttpSession s) {
-        notifiers.forEach(it -> it.sessionDestroyed(s));
-    }
+  @Override
+  public void sessionDestroyed(HttpSession s) {
+    notifiers.forEach(it -> it.sessionDestroyed(s));
+  }
 
-    @Override
-    public void attributeAdded(HttpSession s, String attrName, Object value) {
-        notifiers.forEach(it -> it.attributeAdded(s, attrName, value));
-    }
+  @Override
+  public void attributeAdded(HttpSession s, String attrName, Object value) {
+    notifiers.forEach(it -> it.attributeAdded(s, attrName, value));
+  }
 
-    @Override
-    public void attributeRemoved(HttpSession s, String attrName, Object prevValue) {
-        notifiers.forEach(it -> it.attributeRemoved(s, attrName, prevValue));
-    }
+  @Override
+  public void attributeRemoved(HttpSession s, String attrName, Object prevValue) {
+    notifiers.forEach(it -> it.attributeRemoved(s, attrName, prevValue));
+  }
 
-    @Override
-    public void attributeReplaced(HttpSession s, String attrName, Object prevValue, Object newValue) {
-        notifiers.forEach(it -> it.attributeReplaced(s, attrName, prevValue, newValue));
-    }
+  @Override
+  public void attributeReplaced(HttpSession s, String attrName, Object prevValue, Object newValue) {
+    notifiers.forEach(it -> it.attributeReplaced(s, attrName, prevValue, newValue));
+  }
 }

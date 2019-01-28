@@ -16,17 +16,15 @@ package com.github.erdanielli.tksession.listener;
 import com.github.erdanielli.tksession.Session;
 import com.github.erdanielli.tksession.SessionWrapper;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 final class UnobservedSession extends SessionWrapper {
 
-    UnobservedSession(Session original) {
-        super(original);
-    }
+  UnobservedSession(Session original) {
+    super(original);
+  }
 
-    @Override
-    public void invalidate() {
-        // NOP
-    }
+  @Override
+  public void invalidate() {
+    // NOP
+  }
 }

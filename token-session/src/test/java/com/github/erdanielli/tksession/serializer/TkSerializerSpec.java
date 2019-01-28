@@ -32,89 +32,90 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 abstract class TkSerializerSpec {
-    private SessionListenerNotifier notifier = new SessionListenerNotifierBuilder().build();
+  private SessionListenerNotifier notifier = new SessionListenerNotifierBuilder().build();
 
-    abstract TkSerializer createTkSerializer();
+  abstract TkSerializer createTkSerializer();
 
-    @Test
-    void shouldSupportNewSessions() {
-        doTest(newSession());
-    }
+  @Test
+  void shouldSupportNewSessions() {
+    doTest(newSession());
+  }
 
-    @Test
-    void shouldSupportRestoredSession() {
-        final Session session = new SpecCompleteSession(mock(ServletContext.class), notifier.observe(
+  @Test
+  void shouldSupportRestoredSession() {
+    final Session session =
+        new SpecCompleteSession(
+            mock(ServletContext.class),
+            notifier.observe(
                 new RestoredTokenSession(randomUUID(), 1L, 2L, 3, singletonMap("foo", "Bar"))));
-        doTest(session);
+    doTest(session);
+  }
+
+  @Test
+  void shouldRethrowUnexpectedExceptions() {
+    final TkSerializer serializer = createTkSerializer();
+    assertUncheckedIOExceptionOnRead(serializer::read);
+    assertUncheckedIOExceptionOnWrite(output -> serializer.write(newSession(), output));
+  }
+
+  final void assertEquals(Session actual, Session expected) {
+    assertThat(actual.getId()).isEqualTo(expected.getId());
+    assertThat(actual.getCreationTime()).isEqualTo(expected.getCreationTime());
+    assertThat(actual.getLastAccessedTime()).isEqualTo(expected.getLastAccessedTime());
+    assertThat(actual.getMaxInactiveInterval()).isEqualTo(expected.getMaxInactiveInterval());
+    assertThat(actual.attributes()).containsAllEntriesOf(expected.attributes());
+  }
+
+  private Session newSession() {
+    return new SpecCompleteSession(mock(ServletContext.class), notifier.observe(new NewSession()));
+  }
+
+  private void doTest(Session expected) {
+    assertEquals(writeThenRead(expected), expected);
+  }
+
+  private Session writeThenRead(Session session) {
+    final TkSerializer serializer = createTkSerializer();
+    final Bytes bytes = new Bytes();
+    serializer.write(session, bytes.output());
+    return serializer.read(bytes.input());
+  }
+
+  final void assertUncheckedIOExceptionOnRead(CheckedConsumer<InputStream> action) {
+    assertUncheckedIOException(brokenInput(), action);
+  }
+
+  final void assertUncheckedIOExceptionOnWrite(CheckedConsumer<OutputStream> action) {
+    assertUncheckedIOException(brokenOutput(), action);
+  }
+
+  private <T> void assertUncheckedIOException(T value, CheckedConsumer<T> action) {
+    try {
+      action.accept(value);
+    } catch (UncheckedIOException | IOException e) {
+      // OK
+    } catch (Exception e) {
+      fail("should fail with some IOException, got '%s'", e.getClass().getName());
+    }
+  }
+
+  private static class Bytes {
+    ByteArrayOutputStream output;
+
+    OutputStream output() {
+      output = new ByteArrayOutputStream();
+      return output;
     }
 
-    @Test
-    void shouldRethrowUnexpectedExceptions() {
-        final TkSerializer serializer = createTkSerializer();
-        assertUncheckedIOExceptionOnRead(serializer::read);
-        assertUncheckedIOExceptionOnWrite(output -> serializer.write(newSession(), output));
+    InputStream input() {
+      return new ByteArrayInputStream(output.toByteArray());
     }
+  }
 
-    final void assertEquals(Session actual, Session expected) {
-        assertThat(actual.getId()).isEqualTo(expected.getId());
-        assertThat(actual.getCreationTime()).isEqualTo(expected.getCreationTime());
-        assertThat(actual.getLastAccessedTime()).isEqualTo(expected.getLastAccessedTime());
-        assertThat(actual.getMaxInactiveInterval()).isEqualTo(expected.getMaxInactiveInterval());
-        assertThat(actual.attributes()).containsAllEntriesOf(expected.attributes());
-    }
-
-    private Session newSession() {
-        return new SpecCompleteSession(mock(ServletContext.class), notifier.observe(new NewSession()));
-    }
-
-    private void doTest(Session expected) {
-        assertEquals(writeThenRead(expected), expected);
-    }
-
-    private Session writeThenRead(Session session) {
-        final TkSerializer serializer = createTkSerializer();
-        final Bytes bytes = new Bytes();
-        serializer.write(session, bytes.output());
-        return serializer.read(bytes.input());
-    }
-
-    final void assertUncheckedIOExceptionOnRead(CheckedConsumer<InputStream> action) {
-        assertUncheckedIOException(brokenInput(), action);
-    }
-
-    final void assertUncheckedIOExceptionOnWrite(CheckedConsumer<OutputStream> action) {
-        assertUncheckedIOException(brokenOutput(), action);
-    }
-
-    private <T> void assertUncheckedIOException(T value, CheckedConsumer<T> action) {
-        try {
-            action.accept(value);
-        } catch (UncheckedIOException | IOException e) {
-            // OK
-        } catch (Exception e) {
-            fail("should fail with some IOException, got '%s'", e.getClass().getName());
-        }
-    }
-
-    private static class Bytes {
-        ByteArrayOutputStream output;
-
-        OutputStream output() {
-            output = new ByteArrayOutputStream();
-            return output;
-        }
-
-        InputStream input() {
-            return new ByteArrayInputStream(output.toByteArray());
-        }
-    }
-
-    @FunctionalInterface
-    interface CheckedConsumer<T> {
-        void accept(T value) throws Exception;
-    }
+  @FunctionalInterface
+  interface CheckedConsumer<T> {
+    void accept(T value) throws Exception;
+  }
 }

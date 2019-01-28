@@ -23,53 +23,53 @@ import static com.github.erdanielli.tksession.SessionAssert.assertThat;
 import static java.util.Collections.singletonMap;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 class SpecCompleteSession_AttributesTest {
-    private Session newSession = new SpecCompleteSession(mock(ServletContext.class), new NewSession());
-    private Session session = new SpecCompleteSession(mock(ServletContext.class),
-            new RestoredTokenSession(UUID.randomUUID(), 0L, 0L, 0, singletonMap("foo", "Bar")));
+  private Session newSession =
+      new SpecCompleteSession(mock(ServletContext.class), new NewSession());
+  private Session session =
+      new SpecCompleteSession(
+          mock(ServletContext.class),
+          new RestoredTokenSession(UUID.randomUUID(), 0L, 0L, 0, singletonMap("foo", "Bar")));
 
-    @Test
-    void shouldAllowNewAttributes() {
-        newSession.setAttribute("name", "John");
-        assertThat(newSession).hasAttributes("name", "John");
+  @Test
+  void shouldAllowNewAttributes() {
+    newSession.setAttribute("name", "John");
+    assertThat(newSession).hasAttributes("name", "John");
 
-        session.setAttribute("age", 37);
-        assertThat(session).hasAttributes("foo", "Bar", "age", 37);
-    }
+    session.setAttribute("age", 37);
+    assertThat(session).hasAttributes("foo", "Bar", "age", 37);
+  }
 
-    @Test
-    void shouldAllowAttributeSubstitution() {
-        session.setAttribute("foo", true);
-        assertThat(session).hasAttributes("foo", true);
-    }
+  @Test
+  void shouldAllowAttributeSubstitution() {
+    session.setAttribute("foo", true);
+    assertThat(session).hasAttributes("foo", true);
+  }
 
-    @Test
-    void shouldAllowAttributeRemoval() {
-        newSession.setAttribute("foo", 1);
-        newSession.removeAttribute("foo");
-        assertThat(newSession).hasNoAttributes();
+  @Test
+  void shouldAllowAttributeRemoval() {
+    newSession.setAttribute("foo", 1);
+    newSession.removeAttribute("foo");
+    assertThat(newSession).hasNoAttributes();
 
-        session.setAttribute("foo", null);
-        assertThat(session).hasNoAttributes();
-    }
+    session.setAttribute("foo", null);
+    assertThat(session).hasNoAttributes();
+  }
 
-    @Test
-    void shouldSupportDeprecatedApi() {
-        Assertions.assertThat(session.getValue("foo"))
-                .withFailMessage("session#getValue is broken")
-                .isEqualTo("Bar");
+  @Test
+  void shouldSupportDeprecatedApi() {
+    Assertions.assertThat(session.getValue("foo"))
+        .withFailMessage("session#getValue is broken")
+        .isEqualTo("Bar");
 
-        session.putValue("v_name", "Deprecated");
-        Assertions.assertThat(session.getValueNames())
-                .withFailMessage("session#getValueNames is broken")
-                .containsExactlyInAnyOrder("v_name", "foo");
+    session.putValue("v_name", "Deprecated");
+    Assertions.assertThat(session.getValueNames())
+        .withFailMessage("session#getValueNames is broken")
+        .containsExactlyInAnyOrder("v_name", "foo");
 
-        session.putValue("foo", null);
-        session.removeValue("v_name");
-        assertThat(session).hasNoAttributes();
-    }
-
+    session.putValue("foo", null);
+    session.removeValue("v_name");
+    assertThat(session).hasNoAttributes();
+  }
 }

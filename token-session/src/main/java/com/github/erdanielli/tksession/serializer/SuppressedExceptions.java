@@ -16,18 +16,18 @@ package com.github.erdanielli.tksession.serializer;
 import java.io.IOException;
 import java.io.ObjectInput;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
+@SuppressWarnings("squid:S1610")
 abstract class SuppressedExceptions {
 
-    @SuppressWarnings("unchecked")
-    static <T> T readObject(ObjectInput input) throws IOException {
-        try {
-            return (T) input.readObject();
-        } catch (ClassNotFoundException e) {
-            throw new IOException("unknown type", e);
-        }
+  @SuppressWarnings("unchecked")
+  static <T> T readObject(ObjectInput input) throws IOException {
+    try {
+      return (T) input.readObject();
+    } catch (ClassNotFoundException e) {
+      throw new IOException("unknown type", e);
     }
+  }
 
+  private SuppressedExceptions() {}
 }

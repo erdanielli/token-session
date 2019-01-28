@@ -22,37 +22,36 @@ import java.util.UUID;
 import static com.github.erdanielli.tksession.SessionAssert.assertThat;
 import static java.util.Collections.emptyMap;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 class SpecCompleteSession_ExpirationTest {
-    private long tenSecondsAgo = System.currentTimeMillis() - 10_000L;
-    private Session session = new SpecCompleteSession(Mockito.mock(ServletContext.class),
-            new RestoredTokenSession(UUID.randomUUID(), tenSecondsAgo, tenSecondsAgo, 0, emptyMap()));
+  private long tenSecondsAgo = System.currentTimeMillis() - 10_000L;
+  private Session session =
+      new SpecCompleteSession(
+          Mockito.mock(ServletContext.class),
+          new RestoredTokenSession(UUID.randomUUID(), tenSecondsAgo, tenSecondsAgo, 0, emptyMap()));
 
-    @Test
-    void shouldExpireIfInactive() {
-        session.setMaxInactiveInterval(10);
-        assertThat(session).hasExpired();
-        session.setMaxInactiveInterval(15);
-        assertThat(session).hasNotExpired();
-    }
+  @Test
+  void shouldExpireIfInactive() {
+    session.setMaxInactiveInterval(10);
+    assertThat(session).hasExpired();
+    session.setMaxInactiveInterval(15);
+    assertThat(session).hasNotExpired();
+  }
 
-    @Test
-    void shouldNeverExpireWhenInactiveIntervalIsZero() {
-        assertThat(session).hasNotExpired();
-    }
+  @Test
+  void shouldNeverExpireWhenInactiveIntervalIsZero() {
+    assertThat(session).hasNotExpired();
+  }
 
-    @Test
-    void shouldAllowChangesToMaxInactiveInterval() {
-        session.setMaxInactiveInterval(10);
-        assertThat(session).hasMaxInactiveInterval(10);
-    }
+  @Test
+  void shouldAllowChangesToMaxInactiveInterval() {
+    session.setMaxInactiveInterval(10);
+    assertThat(session).hasMaxInactiveInterval(10);
+  }
 
-    @Test
-    void shouldSetZeroOnNegativeMaxInactiveInterval() {
-        session.setMaxInactiveInterval(-1);
-        assertThat(session).hasMaxInactiveInterval(0);
-    }
-
+  @Test
+  void shouldSetZeroOnNegativeMaxInactiveInterval() {
+    session.setMaxInactiveInterval(-1);
+    assertThat(session).hasMaxInactiveInterval(0);
+  }
 }

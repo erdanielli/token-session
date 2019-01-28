@@ -17,39 +17,25 @@ import com.github.erdanielli.tksession.Session;
 
 import javax.servlet.http.HttpSession;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 public interface SessionListenerNotifier {
 
-    SessionListenerNotifier NULL = new SessionListenerNotifier() {
-        @Override
-        public Session observe(Session session) {
-            return new UnobservedSession(session);
-        }
-    };
+  default Session observe(Session session) {
+    return new ObservedSession(this, session);
+  }
 
-    default Session observe(Session session) {
-        return new ObservedSession(this, session);
-    }
+  // HttpSessionListener
 
-    // HttpSessionListener
+  default void sessionCreated(HttpSession s) {}
 
-    default void sessionCreated(HttpSession s) {
-    }
+  default void sessionDestroyed(HttpSession s) {}
 
-    default void sessionDestroyed(HttpSession s) {
-    }
+  // HttpSessionAttributeListener
 
-    // HttpSessionAttributeListener
+  default void attributeAdded(HttpSession s, String attrName, Object value) {}
 
-    default void attributeAdded(HttpSession s, String attrName, Object value) {
-    }
+  default void attributeRemoved(HttpSession s, String attrName, Object prevValue) {}
 
-    default void attributeRemoved(HttpSession s, String attrName, Object prevValue) {
-    }
-
-    default void attributeReplaced(HttpSession s, String attrName, Object prevValue, Object newValue) {
-    }
-
+  default void attributeReplaced(
+      HttpSession s, String attrName, Object prevValue, Object newValue) {}
 }

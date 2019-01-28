@@ -13,13 +13,11 @@
  */
 package com.github.erdanielli.tksession.serializer;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 class TkAesSerializerTest extends TkSerializerSpec {
 
-    @Override
-    TkSerializer createTkSerializer() {
-        return new TkAesSerializer("s3cret", new TkJdkSerializer());
-    }
+  @Override
+  TkSerializer createTkSerializer() {
+    return new TkAesSerializer("s3cret", new TkJdkSerializer());
+  }
 }

@@ -17,29 +17,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 final class BrokenStream {
 
-    private BrokenStream() {
-    }
+  private BrokenStream() {}
 
-    static InputStream brokenInput() {
-        return new InputStream() {
-            @Override
-            public int read() throws IOException {
-                throw new IOException("BROKEN");
-            }
-        };
-    }
+  static InputStream brokenInput() {
+    return new InputStream() {
+      @Override
+      public int read() throws IOException {
+        throw new IOException("BROKEN");
+      }
+    };
+  }
 
-    static OutputStream brokenOutput() {
-        return new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                throw new IOException("BROKEN");
-            }
-        };
-    }
+  static OutputStream brokenOutput() {
+    return new OutputStream() {
+      @Override
+      public void write(int b) throws IOException {
+        throw new IOException("BROKEN");
+      }
+    };
+  }
 }

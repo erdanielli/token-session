@@ -24,72 +24,70 @@ import java.util.UUID;
 
 import static com.github.erdanielli.tksession.serializer.SuppressedExceptions.readObject;
 
-/**
- * @author erdanielli
- */
+/** @author erdanielli */
 public final class TkJdkSerializer implements TkSerializer {
 
-    @Override
-    public void write(Session session, OutputStream out) {
-        try {
-            final ObjectOutputStream output = new ObjectOutputStream(out);
-            writeSessionId(output, session);
-            output.writeLong(session.getCreationTime());
-            output.writeLong(session.getLastAccessedTime());
-            output.writeInt(session.getMaxInactiveInterval());
-            writeAttributes(output, session);
-            output.flush();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+  @Override
+  public void write(Session session, OutputStream out) {
+    try {
+      final ObjectOutputStream output = new ObjectOutputStream(out);
+      writeSessionId(output, session);
+      output.writeLong(session.getCreationTime());
+      output.writeLong(session.getLastAccessedTime());
+      output.writeInt(session.getMaxInactiveInterval());
+      writeAttributes(output, session);
+      output.flush();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
+  }
 
-    @Override
-    public Session read(InputStream in) {
-        try {
-            final ObjectInputStream input = new ObjectInputStream(in);
-            final UUID sessionId = readSessionId(input);
-            final long creationTime = input.readLong();
-            final long lastAccessedTime = input.readLong();
-            final int maxInactiveInterval = input.readInt();
-            return new RestoredTokenSession(sessionId, creationTime, lastAccessedTime, maxInactiveInterval,
-                    readAttributes(input));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+  @Override
+  public Session read(InputStream in) {
+    try {
+      final ObjectInputStream input = new ObjectInputStream(in);
+      final UUID sessionId = readSessionId(input);
+      final long creationTime = input.readLong();
+      final long lastAccessedTime = input.readLong();
+      final int maxInactiveInterval = input.readInt();
+      return new RestoredTokenSession(
+          sessionId, creationTime, lastAccessedTime, maxInactiveInterval, readAttributes(input));
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
+  }
 
-    private void writeSessionId(ObjectOutputStream output, Session s) throws IOException {
-        final UUID uuid = s.getUUID();
-        output.writeLong(uuid.getMostSignificantBits());
-        output.writeLong(uuid.getLeastSignificantBits());
-    }
+  private void writeSessionId(ObjectOutputStream output, Session s) throws IOException {
+    final UUID uuid = s.getUUID();
+    output.writeLong(uuid.getMostSignificantBits());
+    output.writeLong(uuid.getLeastSignificantBits());
+  }
 
-    private UUID readSessionId(ObjectInputStream input) throws IOException {
-        final long most = input.readLong();
-        final long least = input.readLong();
-        return new UUID(most, least);
-    }
+  private UUID readSessionId(ObjectInputStream input) throws IOException {
+    final long most = input.readLong();
+    final long least = input.readLong();
+    return new UUID(most, least);
+  }
 
-    private void writeAttributes(ObjectOutputStream output, Session s) throws IOException {
-        final Map<String, Object> m = s.attributes();
-        output.writeInt(m.size());
-        for (Map.Entry<String, Object> e : m.entrySet()) {
-            output.writeObject(e.getKey());
-            output.writeObject(e.getValue());
-        }
+  private void writeAttributes(ObjectOutputStream output, Session s) throws IOException {
+    final Map<String, Object> m = s.attributes();
+    output.writeInt(m.size());
+    for (Map.Entry<String, Object> e : m.entrySet()) {
+      output.writeObject(e.getKey());
+      output.writeObject(e.getValue());
     }
+  }
 
-    private Map<String, Object> readAttributes(ObjectInputStream input) throws IOException {
-        final int size = input.readInt();
-        if (size == 0) {
-            return Collections.emptyMap();
-        }
-        final Map<String, Object> m = new HashMap<>(size);
-        for (int i = 0; i < size; i++) {
-            final String key = readObject(input);
-            m.put(key, readObject(input));
-        }
-        return m;
+  private Map<String, Object> readAttributes(ObjectInputStream input) throws IOException {
+    final int size = input.readInt();
+    if (size == 0) {
+      return Collections.emptyMap();
     }
+    final Map<String, Object> m = new HashMap<>(size);
+    for (int i = 0; i < size; i++) {
+      final String key = readObject(input);
+      m.put(key, readObject(input));
+    }
+    return m;
+  }
 }
