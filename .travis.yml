@@ -4,7 +4,14 @@ matrix:
   include:
     - jdk: oraclejdk8
     - jdk: openjdk11
-script: ./mvnw clean verify -Pci
+addons:
+  sonarcloud:
+    organization: "erdanielli-github"
+script: ./mvnw clean verify sonar:sonar -Pci
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.sonar/cache'
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
