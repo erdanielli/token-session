@@ -13,8 +13,7 @@
  */
 package com.github.erdanielli.tksession.serializer;
 
-import java.io.IOException;
-import java.io.ObjectInput;
+import java.io.*;
 
 /** @author erdanielli */
 @SuppressWarnings("squid:S1610")
@@ -29,5 +28,20 @@ abstract class SuppressedExceptions {
     }
   }
 
+    static byte[] writeToByteArray(CheckedConsumer cn) {
+        final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (final ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+            cn.accept(output);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        return bytes.toByteArray();
+    }
+
   private SuppressedExceptions() {}
+
+    @FunctionalInterface
+    interface CheckedConsumer {
+        void accept(ObjectOutput output) throws IOException;
+    }
 }

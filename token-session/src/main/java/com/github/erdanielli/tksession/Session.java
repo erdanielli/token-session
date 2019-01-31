@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
  *
  * @author erdanielli
  */
+@SuppressWarnings("deprecation")
 public abstract class Session implements HttpSession {
 
   public abstract UUID getUUID();
@@ -49,7 +50,7 @@ public abstract class Session implements HttpSession {
 
   // deprecated methods
 
-  @SuppressWarnings({"squid:CallToDeprecatedMethod", "deprecation"})
+  @SuppressWarnings("squid:CallToDeprecatedMethod")
   public final HttpSessionContext getSessionContext() {
     throw new UnsupportedOperationException();
   }

@@ -29,17 +29,14 @@ public final class TkJdkSerializer implements TkSerializer {
 
   @Override
   public byte[] write(Session session) {
-    final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-    try (final ObjectOutputStream output = new ObjectOutputStream(bytes)) {
-      writeSessionId(output, session);
-      output.writeLong(session.getCreationTime());
-      output.writeLong(session.getLastAccessedTime());
-      output.writeInt(session.getMaxInactiveInterval());
-      writeAttributes(output, session);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-    return bytes.toByteArray();
+    return SuppressedExceptions.writeToByteArray(
+            output -> {
+              writeSessionId(output, session);
+              output.writeLong(session.getCreationTime());
+              output.writeLong(session.getLastAccessedTime());
+              output.writeInt(session.getMaxInactiveInterval());
+              writeAttributes(output, session);
+            });
   }
 
   @Override
@@ -56,7 +53,7 @@ public final class TkJdkSerializer implements TkSerializer {
     }
   }
 
-  private void writeSessionId(ObjectOutputStream output, Session s) throws IOException {
+  private void writeSessionId(ObjectOutput output, Session s) throws IOException {
     final UUID uuid = s.getUUID();
     output.writeLong(uuid.getMostSignificantBits());
     output.writeLong(uuid.getLeastSignificantBits());
@@ -68,7 +65,7 @@ public final class TkJdkSerializer implements TkSerializer {
     return new UUID(most, least);
   }
 
-  private void writeAttributes(ObjectOutputStream output, Session s) throws IOException {
+  private void writeAttributes(ObjectOutput output, Session s) throws IOException {
     final Map<String, Object> m = s.attributes();
     output.writeInt(m.size());
     for (Map.Entry<String, Object> e : m.entrySet()) {
