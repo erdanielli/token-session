@@ -32,7 +32,11 @@ public final class TkBase64Serializer implements TkSerializer {
    * @return A restored session
    */
   public Session readToken(String base64Token) {
-    return next.read(Base64.getDecoder().decode(base64Token));
+    try {
+      return next.read(Base64.getDecoder().decode(base64Token));
+    } catch (RuntimeException e) {
+      throw new InvalidTokenException(e);
+    }
   }
 
   /**
@@ -57,10 +61,7 @@ public final class TkBase64Serializer implements TkSerializer {
    */
   @Override
   public byte[] write(Session session) {
-    return encode(next.write(session));
+    return Base64.getEncoder().encode(next.write(session));
   }
 
-  private byte[] encode(byte[] binaryContent) {
-    return Base64.getEncoder().encode(binaryContent);
-  }
 }

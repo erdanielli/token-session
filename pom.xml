@@ -43,6 +43,7 @@
                             <excludes>
                                 <exclude>**/AesCrypto.*</exclude>
                                 <exclude>**/SuppressedExceptions.*</exclude>
+                                <exclude>**/OnCommittedResponseWrapper.*</exclude>
                             </excludes>
                         </configuration>
                         <executions>

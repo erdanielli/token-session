@@ -18,8 +18,6 @@ import com.github.erdanielli.tksession.Session;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.UncheckedIOException;
-
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,6 +42,6 @@ class TkBase64SerializerTest extends TkSerializerSpec {
   @Test
   void shouldFailOnInvalidToken() {
     Assertions.assertThatThrownBy(() -> serializer.readToken("ASDF"))
-        .isInstanceOf(UncheckedIOException.class);
+        .isInstanceOf(InvalidTokenException.class);
   }
 }
