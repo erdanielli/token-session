@@ -22,14 +22,10 @@ import com.github.erdanielli.tksession.listener.SessionListenerNotifierBuilder;
 import org.junit.jupiter.api.Test;
 
 import javax.servlet.ServletContext;
-import java.io.*;
 
-import static com.github.erdanielli.tksession.serializer.BrokenStream.brokenInput;
-import static com.github.erdanielli.tksession.serializer.BrokenStream.brokenOutput;
 import static java.util.Collections.singletonMap;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 /** @author erdanielli */
@@ -53,13 +49,6 @@ abstract class TkSerializerSpec {
     doTest(session);
   }
 
-  @Test
-  void shouldRethrowUnexpectedExceptions() {
-    final TkSerializer serializer = createTkSerializer();
-    assertUncheckedIOExceptionOnRead(serializer::read);
-    assertUncheckedIOExceptionOnWrite(output -> serializer.write(newSession(), output));
-  }
-
   final void assertEquals(Session actual, Session expected) {
     assertThat(actual.getId()).isEqualTo(expected.getId());
     assertThat(actual.getCreationTime()).isEqualTo(expected.getCreationTime());
@@ -78,44 +67,6 @@ abstract class TkSerializerSpec {
 
   private Session writeThenRead(Session session) {
     final TkSerializer serializer = createTkSerializer();
-    final Bytes bytes = new Bytes();
-    serializer.write(session, bytes.output());
-    return serializer.read(bytes.input());
-  }
-
-  final void assertUncheckedIOExceptionOnRead(CheckedConsumer<InputStream> action) {
-    assertUncheckedIOException(brokenInput(), action);
-  }
-
-  final void assertUncheckedIOExceptionOnWrite(CheckedConsumer<OutputStream> action) {
-    assertUncheckedIOException(brokenOutput(), action);
-  }
-
-  private <T> void assertUncheckedIOException(T value, CheckedConsumer<T> action) {
-    try {
-      action.accept(value);
-    } catch (UncheckedIOException | IOException e) {
-      // OK
-    } catch (Exception e) {
-      fail("should fail with some IOException, got '%s'", e.getClass().getName());
-    }
-  }
-
-  private static class Bytes {
-    ByteArrayOutputStream output;
-
-    OutputStream output() {
-      output = new ByteArrayOutputStream();
-      return output;
-    }
-
-    InputStream input() {
-      return new ByteArrayInputStream(output.toByteArray());
-    }
-  }
-
-  @FunctionalInterface
-  interface CheckedConsumer<T> {
-    void accept(T value) throws Exception;
+    return serializer.read(serializer.write(session));
   }
 }

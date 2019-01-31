@@ -15,12 +15,8 @@ package com.github.erdanielli.tksession.serializer;
 
 import com.github.erdanielli.tksession.Session;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UncheckedIOException;
-
 /** @author erdanielli */
-public final class TkAesSerializer extends TkInMemorySerializer {
+public final class TkAesSerializer implements TkSerializer {
   private final AesCrypto aes;
   private final TkSerializer original;
 
@@ -30,16 +26,12 @@ public final class TkAesSerializer extends TkInMemorySerializer {
   }
 
   @Override
-  protected Session read(byte[] token) {
+  public Session read(byte[] token) {
     return original.read(aes.decrypt(token));
   }
 
   @Override
-  public void write(Session session, OutputStream out) {
-    try {
-      out.write(aes.encrypt(forwardWrite(session, original)));
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+  public byte[] write(Session session) {
+    return aes.encrypt(original.write(session));
   }
 }

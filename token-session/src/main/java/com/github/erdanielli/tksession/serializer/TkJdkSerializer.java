@@ -28,24 +28,23 @@ import static com.github.erdanielli.tksession.serializer.SuppressedExceptions.re
 public final class TkJdkSerializer implements TkSerializer {
 
   @Override
-  public void write(Session session, OutputStream out) {
-    try {
-      final ObjectOutputStream output = new ObjectOutputStream(out);
+  public byte[] write(Session session) {
+    final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    try (final ObjectOutputStream output = new ObjectOutputStream(bytes)) {
       writeSessionId(output, session);
       output.writeLong(session.getCreationTime());
       output.writeLong(session.getLastAccessedTime());
       output.writeInt(session.getMaxInactiveInterval());
       writeAttributes(output, session);
-      output.flush();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+    return bytes.toByteArray();
   }
 
   @Override
-  public Session read(InputStream in) {
-    try {
-      final ObjectInputStream input = new ObjectInputStream(in);
+  public Session read(byte[] bytes) {
+    try (final ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
       final UUID sessionId = readSessionId(input);
       final long creationTime = input.readLong();
       final long lastAccessedTime = input.readLong();

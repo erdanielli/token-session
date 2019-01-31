@@ -18,8 +18,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -38,9 +36,9 @@ final class AesCrypto {
     initCipher(DECRYPT_MODE);
   }
 
-  InputStream decrypt(byte[] encryptedInput) {
+  byte[] decrypt(byte[] encryptedInput) {
     try {
-      return new ByteArrayInputStream(initCipher(DECRYPT_MODE).doFinal(encryptedInput));
+      return initCipher(DECRYPT_MODE).doFinal(encryptedInput);
     } catch (BadPaddingException | IllegalBlockSizeException e) {
       throw new IllegalArgumentException("AES decryption failed", e);
     }

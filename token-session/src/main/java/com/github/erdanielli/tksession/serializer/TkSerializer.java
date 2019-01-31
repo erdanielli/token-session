@@ -15,20 +15,10 @@ package com.github.erdanielli.tksession.serializer;
 
 import com.github.erdanielli.tksession.Session;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 /** @author erdanielli */
 public interface TkSerializer {
 
-  void write(Session session, OutputStream out);
+  byte[] write(Session session);
 
-  Session read(InputStream in);
-
-  default byte[] forwardWrite(Session session, TkSerializer next) {
-    final ByteArrayOutputStream output = new ByteArrayOutputStream();
-    next.write(session, output);
-    return output.toByteArray();
-  }
+  Session read(byte[] input);
 }

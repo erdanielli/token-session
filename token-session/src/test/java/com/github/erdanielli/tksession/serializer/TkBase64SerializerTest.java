@@ -18,7 +18,6 @@ import com.github.erdanielli.tksession.Session;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.UncheckedIOException;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
@@ -36,10 +35,9 @@ class TkBase64SerializerTest extends TkSerializerSpec {
   @Test
   void shouldWriteAndReadString() {
     final Session session = new NewSession();
-    final ByteArrayOutputStream out = new ByteArrayOutputStream();
-    serializer.write(session, out);
+    final byte[] tokenBytes = serializer.write(session);
     final String tokenString = serializer.writeToken(session);
-    assertThat(tokenString).isEqualTo(new String(out.toByteArray(), ISO_8859_1));
+    assertThat(tokenString).isEqualTo(new String(tokenBytes, ISO_8859_1));
     assertEquals(serializer.readToken(tokenString), session);
   }
 
