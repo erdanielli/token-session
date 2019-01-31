@@ -17,10 +17,9 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -29,26 +28,44 @@ import static javax.crypto.Cipher.ENCRYPT_MODE;
 
 /** @author erdanielli */
 final class AesCrypto {
+  private static final String ALG = "AES/GCM/NoPadding";
+  private final SecureRandom secureRandom;
   private final SecretKeySpec key;
+  private final Cipher encryptor;
+  private final Cipher decryptor;
 
   AesCrypto(String plainSecret) {
-    this.key = createKey(plainSecret);
-    initCipher(DECRYPT_MODE);
+    secureRandom = new SecureRandom();
+    key = createKey(plainSecret);
+    try {
+      encryptor = Cipher.getInstance(ALG);
+      decryptor = Cipher.getInstance(ALG);
+    } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+      throw new IllegalArgumentException("AES not supported", e);
+    }
   }
 
   byte[] decrypt(byte[] encryptedInput) {
-    try {
-      return initCipher(DECRYPT_MODE).doFinal(encryptedInput);
-    } catch (BadPaddingException | IllegalBlockSizeException e) {
-      throw new IllegalArgumentException("AES decryption failed", e);
+    synchronized (decryptor) {
+      try {
+        final byte[] iv = iv(encryptedInput);
+        final byte[] input = subArray(encryptedInput, iv.length);
+        return initCipher(decryptor, DECRYPT_MODE, iv).doFinal(input);
+      } catch (BadPaddingException | IllegalBlockSizeException e) {
+        throw new IllegalArgumentException("AES decryption failed", e);
+      }
     }
   }
 
   byte[] encrypt(byte[] plainInput) {
-    try {
-      return initCipher(ENCRYPT_MODE).doFinal(plainInput);
-    } catch (BadPaddingException | IllegalBlockSizeException e) {
-      throw new IllegalArgumentException("AES encryption failed", e);
+    synchronized (encryptor) {
+      try {
+        final byte[] iv = iv();
+        final byte[] encrypted = initCipher(encryptor, ENCRYPT_MODE, iv).doFinal(plainInput);
+        return concatenate(iv, encrypted);
+      } catch (BadPaddingException | IllegalBlockSizeException e) {
+        throw new IllegalArgumentException("AES encryption failed", e);
+      }
     }
   }
 
@@ -63,15 +80,37 @@ final class AesCrypto {
     }
   }
 
-  private Cipher initCipher(int mode) {
+  private Cipher initCipher(Cipher cipher, int mode, byte[] iv) {
     try {
-      final Cipher cipher = Cipher.getInstance("AES");
-      cipher.init(mode, key);
+      cipher.init(mode, key, new GCMParameterSpec(128, iv));
       return cipher;
-    } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-      throw new IllegalArgumentException("AES not supported", e);
-    } catch (InvalidKeyException e) {
+    } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
       throw new IllegalArgumentException("Invalid AES key", e);
     }
+  }
+
+  private byte[] iv() {
+    final byte[] result = new byte[16];
+    secureRandom.nextBytes(result);
+    return result;
+  }
+
+  private byte[] iv(byte[] encryptedInput) {
+    final byte[] result = new byte[16];
+    System.arraycopy(encryptedInput, 0, result, 0, result.length);
+    return result;
+  }
+
+  private byte[] concatenate(byte[] first, byte[] second) {
+    final byte[] result = new byte[first.length + second.length];
+    System.arraycopy(first, 0, result, 0, first.length);
+    System.arraycopy(second, 0, result, first.length, second.length);
+    return result;
+  }
+
+  private byte[] subArray(byte[] array, int skippedBytes) {
+    final byte[] result = new byte[array.length - skippedBytes];
+    System.arraycopy(array, skippedBytes, result, 0, result.length);
+    return result;
   }
 }
