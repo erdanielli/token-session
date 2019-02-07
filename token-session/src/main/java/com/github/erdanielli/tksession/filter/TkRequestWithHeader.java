@@ -15,6 +15,7 @@ package com.github.erdanielli.tksession.filter;
 
 import com.github.erdanielli.tksession.NewSession;
 import com.github.erdanielli.tksession.Session;
+import com.github.erdanielli.tksession.SpecCompleteSession;
 import com.github.erdanielli.tksession.listener.SessionListenerNotifier;
 import com.github.erdanielli.tksession.serializer.TkBase64Serializer;
 
@@ -25,11 +26,14 @@ import java.time.Duration;
 final class TkRequestWithHeader extends TkRequest {
   private final String token;
   private final TkBase64Serializer serializer;
+  private SpecCompleteSession session;
+  private Session restoredTkSession;
 
   TkRequestWithHeader(
           String token,
           TkBase64Serializer serializer,
-          Duration ttl, SessionListenerNotifier notifier,
+          Duration ttl,
+          SessionListenerNotifier notifier,
           HttpServletRequest request) {
     super(ttl, notifier, request);
     this.token = token;
@@ -37,11 +41,27 @@ final class TkRequestWithHeader extends TkRequest {
   }
 
   @Override
-  Session createIncompleteSession() {
-    final Session restored = serializer.readToken(token);
-    if (restored.expired()) {
-      return new NewSession();
+  SpecCompleteSession getSession(boolean create, SessionListenerNotifier notifier, int seconds) {
+    if (restoredTkSession == null) {
+      restoredTkSession = serializer.readToken(token);
+      if (restoredTkSession.expired()) {
+        new SpecCompleteSession(getServletContext(), notifier.observe(restoredTkSession))
+                .invalidate();
+      }
     }
-    return new RenewedSession(restored);
+    if (!create && restoredTkSession.expired()) {
+      return session;
+    }
+    if (session == null) {
+      if (restoredTkSession.expired()) {
+        session = new SpecCompleteSession(getServletContext(), notifier.observe(new NewSession()));
+        session.setMaxInactiveInterval(seconds);
+      } else {
+        session =
+                new SpecCompleteSession(
+                        getServletContext(), notifier.observe(new RenewedSession(restoredTkSession)));
+      }
+    }
+    return session;
   }
 }

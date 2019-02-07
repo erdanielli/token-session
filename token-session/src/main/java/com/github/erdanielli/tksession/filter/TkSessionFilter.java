@@ -44,7 +44,6 @@ public final class TkSessionFilter implements Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
-
     final HttpServletRequest httpReq = (HttpServletRequest) request;
     final HttpServletResponse httpResp = (HttpServletResponse) response;
     final String token = httpReq.getHeader(header);
@@ -59,8 +58,7 @@ public final class TkSessionFilter implements Filter {
     } catch (IOException | ServletException e) {
       if (e.getCause() instanceof InvalidTokenException) {
         tkResponse.sendError(400, "INVALID_SESSION_TOKEN");
-      }
-      else {
+      } else {
         throw e;
       }
     }

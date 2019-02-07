@@ -14,7 +14,7 @@
 package com.github.erdanielli.tksession.filter;
 
 import com.github.erdanielli.tksession.NewSession;
-import com.github.erdanielli.tksession.Session;
+import com.github.erdanielli.tksession.SpecCompleteSession;
 import com.github.erdanielli.tksession.listener.SessionListenerNotifier;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +22,7 @@ import java.time.Duration;
 
 /** @author erdanielli */
 final class TkRequestWithoutHeader extends TkRequest {
+    private SpecCompleteSession session;
 
   TkRequestWithoutHeader(
       Duration ttl, SessionListenerNotifier notifier, HttpServletRequest request) {
@@ -29,7 +30,14 @@ final class TkRequestWithoutHeader extends TkRequest {
   }
 
   @Override
-  Session createIncompleteSession() {
-    return new NewSession();
+  SpecCompleteSession getSession(boolean create, SessionListenerNotifier notifier, int seconds) {
+      if (!create) {
+          return session;
+      }
+      if (session == null) {
+          session = new SpecCompleteSession(getServletContext(), notifier.observe(new NewSession()));
+          session.setMaxInactiveInterval(seconds);
+      }
+      return session;
   }
 }

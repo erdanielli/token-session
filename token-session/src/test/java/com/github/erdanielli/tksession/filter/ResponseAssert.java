@@ -14,50 +14,84 @@
 package com.github.erdanielli.tksession.filter;
 
 import org.assertj.core.api.AbstractAssert;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.MapAssert;
-import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.util.List;
-import java.util.Map;
+import java.io.UnsupportedEncodingException;
 
 /** @author erdanielli */
-final class ResponseAssert
-    extends AbstractAssert<ResponseAssert, ResponseEntity<Map<String, Object>>> {
+@SuppressWarnings({ "SameParameterValue", "UnusedReturnValue" })
+final class ResponseAssert extends AbstractAssert<ResponseAssert, MockHttpServletResponse> {
 
-  static ResponseAssert assertThat(ResponseEntity<Map<String, Object>> actual) {
-    return new ResponseAssert(actual);
+  private final FakeNotifier notifier;
+
+  static ResponseAssert assertThat(FakeNotifier notifier, MockHttpServletResponse actual) {
+    return new ResponseAssert(actual, notifier);
   }
 
-  ResponseAssert hasStatus(int expected) {
-    if (actual.getStatusCodeValue() != expected) {
-      failWithMessage("Expected HTTP status %d, got %d", expected, actual.getStatusCodeValue());
+  ResponseAssert isOk() {
+    if (actual.getStatus() != 200) {
+      failWithMessage("Expected HTTP status 200, got %d", actual.getStatus());
     }
     return this;
   }
 
-  ResponseAssert hasHeader(String name) {
-    final List<String> values = actual.getHeaders().get(name);
-    if (values == null || values.isEmpty()) {
-      failWithMessage("Missing HTTP header %s", name);
+  ResponseAssert isFailure(int status, String message) {
+    if (actual.getStatus() != status) {
+      failWithMessage("Expected HTTP status %d, got %d", status, actual.getStatus());
+    } else if (!message.equals(actual.getErrorMessage())) {
+      failWithMessage("Expected error message '%s', got '%s'", message, actual.getErrorMessage());
     }
     return this;
   }
 
-  ResponseAssert doesNotHaveHeader(String name) {
-    final List<String> values = actual.getHeaders().get(name);
-    if (values != null && values.get(0) != null) {
-      failWithMessage("Not expecting HTTP header %s", name);
+  ResponseAssert hasToken() {
+    final String tokenValue = (String) actual.getHeaderValue("X-SESSION");
+    if (tokenValue == null) {
+      failWithMessage("Missing token (HTTP header X-SESSION)");
     }
     return this;
   }
 
-  MapAssert<String, Object> body() {
-    return Assertions.assertThat(actual.getBody());
+  ResponseAssert doesNotHaveToken() {
+    final String tokenValue = (String) actual.getHeaderValue("X-SESSION");
+    if (tokenValue != null) {
+      failWithMessage("Not expecting token (HTTP header X-SESSION), got '%s'", tokenValue);
+    }
+    return this;
   }
 
-  private ResponseAssert(ResponseEntity<Map<String, Object>> actual) {
+  ResponseAssert hasBody(String expected) {
+    try {
+      if (!expected.equals(actual.getContentAsString())) {
+        failWithMessage(
+                "Expected response body '%s', got '%s'", expected, actual.getContentAsString());
+      }
+    } catch (UnsupportedEncodingException e) {
+      failWithMessage("Could not retrieve response body");
+    }
+    return this;
+  }
+
+  ResponseAssert createdSessions(int exceptedAmount) {
+    if (notifier.sessionsCreated() != exceptedAmount) {
+      failWithMessage(
+              "Expected notifier to notify %dx session creation, got %d",
+              exceptedAmount, notifier.sessionsCreated());
+    }
+    return this;
+  }
+
+  ResponseAssert destroyedSessions(int exceptedAmount) {
+    if (notifier.sessionsDestroyed() != exceptedAmount) {
+      failWithMessage(
+              "Expected notifier to notify %dx session destruction, got %d",
+              exceptedAmount, notifier.sessionsDestroyed());
+    }
+    return this;
+  }
+
+  private ResponseAssert(MockHttpServletResponse actual, FakeNotifier notifier) {
     super(actual, ResponseAssert.class);
-    isNotNull();
+    this.notifier = notifier;
   }
 }
