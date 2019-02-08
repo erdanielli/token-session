@@ -30,11 +30,11 @@ final class TkRequestWithHeader extends TkRequest {
   private Session restoredTkSession;
 
   TkRequestWithHeader(
-          String token,
-          TkBase64Serializer serializer,
-          Duration ttl,
-          SessionListenerNotifier notifier,
-          HttpServletRequest request) {
+      String token,
+      TkBase64Serializer serializer,
+      Duration ttl,
+      SessionListenerNotifier notifier,
+      HttpServletRequest request) {
     super(ttl, notifier, request);
     this.token = token;
     this.serializer = serializer;
@@ -46,7 +46,7 @@ final class TkRequestWithHeader extends TkRequest {
       restoredTkSession = serializer.readToken(token);
       if (restoredTkSession.expired()) {
         new SpecCompleteSession(getServletContext(), notifier.observe(restoredTkSession))
-                .invalidate();
+            .invalidate();
       }
     }
     if (!create && restoredTkSession.expired()) {
@@ -58,8 +58,8 @@ final class TkRequestWithHeader extends TkRequest {
         session.setMaxInactiveInterval(seconds);
       } else {
         session =
-                new SpecCompleteSession(
-                        getServletContext(), notifier.observe(new RenewedSession(restoredTkSession)));
+            new SpecCompleteSession(
+                getServletContext(), notifier.observe(new RenewedSession(restoredTkSession)));
       }
     }
     return session;

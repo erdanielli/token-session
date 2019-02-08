@@ -30,13 +30,13 @@ public final class TkJdkSerializer implements TkSerializer {
   @Override
   public byte[] write(Session session) {
     return SuppressedExceptions.writeToByteArray(
-            output -> {
-              writeSessionId(output, session);
-              output.writeLong(session.getCreationTime());
-              output.writeLong(session.getLastAccessedTime());
-              output.writeInt(session.getMaxInactiveInterval());
-              writeAttributes(output, session);
-            });
+        output -> {
+          writeSessionId(output, session);
+          output.writeLong(session.getCreationTime());
+          output.writeLong(session.getLastAccessedTime());
+          output.writeInt(session.getMaxInactiveInterval());
+          writeAttributes(output, session);
+        });
   }
 
   @Override

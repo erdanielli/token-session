@@ -21,24 +21,24 @@ import java.util.List;
 
 /** @author erdanielli */
 final class FakeNotifier implements SessionListenerNotifier {
-    private final List<String> created = new ArrayList<>();
-    private final List<String> destroyed = new ArrayList<>();
+  private final List<String> created = new ArrayList<>();
+  private final List<String> destroyed = new ArrayList<>();
 
-    @Override
-    public void sessionCreated(HttpSession s) {
-        created.add(s.getId());
-    }
+  @Override
+  public void sessionCreated(HttpSession s) {
+    created.add(s.getId());
+  }
 
-    @Override
-    public void sessionDestroyed(HttpSession s) {
-        destroyed.add(s.getId());
-    }
+  @Override
+  public void sessionDestroyed(HttpSession s) {
+    destroyed.add(s.getId());
+  }
 
-    int sessionsCreated() {
-        return created.size();
-    }
+  int sessionsCreated() {
+    return created.size();
+  }
 
-    int sessionsDestroyed() {
-        return destroyed.size();
-    }
+  int sessionsDestroyed() {
+    return destroyed.size();
+  }
 }

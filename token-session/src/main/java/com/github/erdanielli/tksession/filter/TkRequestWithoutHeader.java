@@ -22,7 +22,7 @@ import java.time.Duration;
 
 /** @author erdanielli */
 final class TkRequestWithoutHeader extends TkRequest {
-    private SpecCompleteSession session;
+  private SpecCompleteSession session;
 
   TkRequestWithoutHeader(
       Duration ttl, SessionListenerNotifier notifier, HttpServletRequest request) {
@@ -31,13 +31,13 @@ final class TkRequestWithoutHeader extends TkRequest {
 
   @Override
   SpecCompleteSession getSession(boolean create, SessionListenerNotifier notifier, int seconds) {
-      if (!create) {
-          return session;
-      }
-      if (session == null) {
-          session = new SpecCompleteSession(getServletContext(), notifier.observe(new NewSession()));
-          session.setMaxInactiveInterval(seconds);
-      }
+    if (!create) {
       return session;
+    }
+    if (session == null) {
+      session = new SpecCompleteSession(getServletContext(), notifier.observe(new NewSession()));
+      session.setMaxInactiveInterval(seconds);
+    }
+    return session;
   }
 }

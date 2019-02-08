@@ -28,20 +28,20 @@ abstract class SuppressedExceptions {
     }
   }
 
-    static byte[] writeToByteArray(CheckedConsumer cn) {
-        final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        try (final ObjectOutputStream output = new ObjectOutputStream(bytes)) {
-            cn.accept(output);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        return bytes.toByteArray();
+  static byte[] writeToByteArray(CheckedConsumer cn) {
+    final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    try (final ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+      cn.accept(output);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
+    return bytes.toByteArray();
+  }
 
   private SuppressedExceptions() {}
 
-    @FunctionalInterface
-    interface CheckedConsumer {
-        void accept(ObjectOutput output) throws IOException;
-    }
+  @FunctionalInterface
+  interface CheckedConsumer {
+    void accept(ObjectOutput output) throws IOException;
+  }
 }

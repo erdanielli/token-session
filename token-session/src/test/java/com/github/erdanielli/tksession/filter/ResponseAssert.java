@@ -19,7 +19,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import java.io.UnsupportedEncodingException;
 
 /** @author erdanielli */
-@SuppressWarnings({ "SameParameterValue", "UnusedReturnValue" })
+@SuppressWarnings({"SameParameterValue", "UnusedReturnValue"})
 final class ResponseAssert extends AbstractAssert<ResponseAssert, MockHttpServletResponse> {
 
   private final FakeNotifier notifier;
@@ -64,7 +64,7 @@ final class ResponseAssert extends AbstractAssert<ResponseAssert, MockHttpServle
     try {
       if (!expected.equals(actual.getContentAsString())) {
         failWithMessage(
-                "Expected response body '%s', got '%s'", expected, actual.getContentAsString());
+            "Expected response body '%s', got '%s'", expected, actual.getContentAsString());
       }
     } catch (UnsupportedEncodingException e) {
       failWithMessage("Could not retrieve response body");
@@ -75,8 +75,8 @@ final class ResponseAssert extends AbstractAssert<ResponseAssert, MockHttpServle
   ResponseAssert createdSessions(int exceptedAmount) {
     if (notifier.sessionsCreated() != exceptedAmount) {
       failWithMessage(
-              "Expected notifier to notify %dx session creation, got %d",
-              exceptedAmount, notifier.sessionsCreated());
+          "Expected notifier to notify %dx session creation, got %d",
+          exceptedAmount, notifier.sessionsCreated());
     }
     return this;
   }
@@ -84,8 +84,8 @@ final class ResponseAssert extends AbstractAssert<ResponseAssert, MockHttpServle
   ResponseAssert destroyedSessions(int exceptedAmount) {
     if (notifier.sessionsDestroyed() != exceptedAmount) {
       failWithMessage(
-              "Expected notifier to notify %dx session destruction, got %d",
-              exceptedAmount, notifier.sessionsDestroyed());
+          "Expected notifier to notify %dx session destruction, got %d",
+          exceptedAmount, notifier.sessionsDestroyed());
     }
     return this;
   }

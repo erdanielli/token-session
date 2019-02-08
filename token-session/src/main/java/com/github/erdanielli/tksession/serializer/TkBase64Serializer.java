@@ -63,5 +63,4 @@ public final class TkBase64Serializer implements TkSerializer {
   public byte[] write(Session session) {
     return Base64.getEncoder().encode(next.write(session));
   }
-
 }

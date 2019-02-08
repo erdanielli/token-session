@@ -25,7 +25,7 @@ import java.time.Duration;
 abstract class TkRequest extends HttpServletRequestWrapper {
   private final Duration ttl;
   private final SessionListenerNotifier notifier;
-    private boolean skip;
+  private boolean skip;
 
   TkRequest(Duration ttl, SessionListenerNotifier notifier, HttpServletRequest request) {
     super(request);
@@ -40,17 +40,17 @@ abstract class TkRequest extends HttpServletRequestWrapper {
 
   @Override
   public final Session getSession(boolean create) {
-      if (!skip) {
-          try {
-              return getSession(create, notifier, (int) ttl.getSeconds());
-          } catch (RuntimeException e) {
-              skip = true;
-              throw e;
-          }
+    if (!skip) {
+      try {
+        return getSession(create, notifier, (int) ttl.getSeconds());
+      } catch (RuntimeException e) {
+        skip = true;
+        throw e;
       }
-      return null;
+    }
+    return null;
   }
 
-    abstract SpecCompleteSession getSession(
-            boolean create, SessionListenerNotifier notifier, int seconds);
+  abstract SpecCompleteSession getSession(
+      boolean create, SessionListenerNotifier notifier, int seconds);
 }
