@@ -16,6 +16,7 @@
     <description>Token Session Build</description>
     <modules>
         <module>token-session</module>
+        <module>spring-boot-autoconfigure</module>
     </modules>
     <build>
         <defaultGoal>clean install</defaultGoal>
@@ -44,6 +45,7 @@
                                 <exclude>**/AesCrypto.*</exclude>
                                 <exclude>**/SuppressedExceptions.*</exclude>
                                 <exclude>**/OnCommittedResponseWrapper*.*</exclude>
+                                <exclude>**/TkSessionAutoConfiguration.*</exclude>
                             </excludes>
                         </configuration>
                         <executions>
