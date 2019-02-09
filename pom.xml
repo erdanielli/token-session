@@ -17,6 +17,7 @@
     <modules>
         <module>token-session</module>
         <module>spring-boot-autoconfigure</module>
+        <module>examples</module>
     </modules>
     <build>
         <defaultGoal>clean install</defaultGoal>
