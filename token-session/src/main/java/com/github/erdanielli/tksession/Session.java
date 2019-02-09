@@ -36,7 +36,7 @@ public abstract class Session implements HttpSession {
             .collect(Collectors.toMap(k -> k, this::getAttribute)));
   }
 
-  public final boolean expired() {
+  public boolean expired() {
     if (getMaxInactiveInterval() == 0) {
       return false;
     }

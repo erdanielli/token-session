@@ -31,6 +31,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static java.lang.Thread.sleep;
+import static java.util.Optional.ofNullable;
 import static org.assertj.core.api.Assertions.fail;
 
 @SuppressWarnings("ConstantConditions")
@@ -61,7 +62,7 @@ class TkSessionFilterTest {
         .createdSessions(1)
         .destroyedSessions(0);
     sleep(1_010L);
-    prepareNextRequestWithToken();
+    prepareNextRequest();
     assertAfterRequest(
             (req, resp) -> {
               req.getSession(false);
@@ -73,7 +74,7 @@ class TkSessionFilterTest {
         .createdSessions(1)
         .destroyedSessions(0);
     sleep(2_010L);
-    prepareNextRequestWithToken();
+    prepareNextRequest();
     assertAfterRequest(
             (req, resp) -> {
               req.getSession(false);
@@ -85,7 +86,7 @@ class TkSessionFilterTest {
         .createdSessions(2)
         .destroyedSessions(1);
     sleep(1_010L);
-    prepareNextRequestWithToken();
+    prepareNextRequest();
     assertAfterRequest((req, resp) -> req.getSession(false))
         .isOk()
         .doesNotHaveToken()
@@ -107,19 +108,29 @@ class TkSessionFilterTest {
         .createdSessions(1)
         .destroyedSessions(0);
     sleep(1_010L);
-    prepareNextRequestWithToken();
+    prepareNextRequest();
     assertAfterRequest((req, resp) -> req.getSession(true))
         .isOk()
         .hasToken()
         .createdSessions(2)
         .destroyedSessions(1);
     sleep(1_010L);
-    prepareNextRequestWithToken();
+    prepareNextRequest();
     assertAfterRequest((req, resp) -> req.getSession(false))
         .isOk()
         .doesNotHaveToken()
         .createdSessions(2)
         .destroyedSessions(2);
+    prepareNextRequest();
+    assertAfterRequest(
+            (req, resp) -> {
+              final HttpSession session = req.getSession(true);
+              session.invalidate();
+            })
+        .isOk()
+        .doesNotHaveToken()
+        .createdSessions(3)
+        .destroyedSessions(3);
   }
 
   @Test
@@ -157,7 +168,7 @@ class TkSessionFilterTest {
         .hasToken()
         .createdSessions(1)
         .destroyedSessions(0);
-    prepareNextRequestWithToken();
+    prepareNextRequest();
     assertAfterRequest(
             new Endpoint() {
               @Override
@@ -206,9 +217,9 @@ class TkSessionFilterTest {
     return ResponseAssert.assertThat(notifier, response);
   }
 
-  private void prepareNextRequestWithToken() {
+  private void prepareNextRequest() {
     request = new MockHttpServletRequest();
-    request.addHeader("X-SESSION", response.getHeader("X-SESSION"));
+    ofNullable(response.getHeader("X-SESSION")).ifPresent(tk -> request.addHeader("X-SESSION", tk));
     response = new MockHttpServletResponse();
   }
 }

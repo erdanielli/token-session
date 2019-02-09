@@ -39,6 +39,7 @@ final class TkResponse extends OnCommittedResponseWrapper {
   @Override
   protected void onResponseCommitted() {
     ofNullable(request.getSession(false))
+        .filter(s -> !s.expired())
         .map(serializer::writeToken)
         .ifPresent(tk -> setHeader(header, tk));
   }

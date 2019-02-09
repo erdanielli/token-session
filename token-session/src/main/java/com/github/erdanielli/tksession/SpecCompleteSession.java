@@ -98,4 +98,9 @@ public final class SpecCompleteSession extends Session {
   public boolean isNew() {
     return incomplete.isNew();
   }
+
+  @Override
+  public boolean expired() {
+    return incomplete.expired();
+  }
 }

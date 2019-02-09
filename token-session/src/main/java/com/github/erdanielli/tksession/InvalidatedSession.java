@@ -64,6 +64,11 @@ final class InvalidatedSession extends SessionWrapper {
     throw invalidatedException();
   }
 
+  @Override
+  public boolean expired() {
+    return true;
+  }
+
   private IllegalStateException invalidatedException() {
     return new IllegalStateException("session was invalidated");
   }

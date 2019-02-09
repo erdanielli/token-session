@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.servlet.ServletContext;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
@@ -32,10 +33,12 @@ class SpecCompleteSession_InvalidationTest {
   @Test
   void allowedMethodsAfterInvalidation() {
     session.invalidate();
+
     session.getId();
     session.setMaxInactiveInterval(10);
     session.getMaxInactiveInterval();
     session.getServletContext();
+    assertThat(session.expired()).isTrue();
   }
 
   @Test
