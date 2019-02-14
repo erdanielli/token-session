@@ -25,10 +25,10 @@ import java.util.UUID;
 import static com.github.erdanielli.tksession.serializer.SuppressedExceptions.readObject;
 
 /** @author erdanielli */
-public final class TkJdkSerializer implements TkSerializer {
+public class TkJdkSerializer implements TkSerializer {
 
   @Override
-  public byte[] write(Session session) {
+  public final byte[] write(Session session) {
     return SuppressedExceptions.writeToByteArray(
         output -> {
           writeSessionId(output, session);
@@ -40,7 +40,7 @@ public final class TkJdkSerializer implements TkSerializer {
   }
 
   @Override
-  public Session read(byte[] bytes) {
+  public final Session read(byte[] bytes) {
     try (final ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
       final UUID sessionId = readSessionId(input);
       final long creationTime = input.readLong();
@@ -69,12 +69,11 @@ public final class TkJdkSerializer implements TkSerializer {
     final Map<String, Object> m = s.attributes();
     output.writeInt(m.size());
     for (Map.Entry<String, Object> e : m.entrySet()) {
-      output.writeObject(e.getKey());
-      output.writeObject(e.getValue());
+      writeAttribute(output, e.getKey(), e.getValue());
     }
   }
 
-  private Map<String, Object> readAttributes(ObjectInputStream input) throws IOException {
+  private Map<String, Object> readAttributes(ObjectInput input) throws IOException {
     final int size = input.readInt();
     if (size == 0) {
       return Collections.emptyMap();
@@ -82,8 +81,17 @@ public final class TkJdkSerializer implements TkSerializer {
     final Map<String, Object> m = new HashMap<>(size);
     for (int i = 0; i < size; i++) {
       final String key = readObject(input);
-      m.put(key, readObject(input));
+      m.put(key, readAttribute(input, key));
     }
     return m;
+  }
+
+  protected void writeAttribute(ObjectOutput output, String name, Object value) throws IOException {
+    output.writeObject(name);
+    output.writeObject(value);
+  }
+
+  protected Object readAttribute(ObjectInput input, String name) throws IOException {
+    return readObject(input);
   }
 }

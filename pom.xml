@@ -17,14 +17,24 @@
     <modules>
         <module>token-session</module>
         <module>spring-boot-autoconfigure</module>
-        <module>examples</module>
     </modules>
     <build>
         <defaultGoal>clean install</defaultGoal>
     </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
     <profiles>
         <profile>
             <id>ci</id>
+            <modules>
+                <module>token-session</module>
+                <module>spring-boot-autoconfigure</module>
+                <module>examples</module>
+            </modules>
             <build>
                 <defaultGoal>clean verify sonar:sonar</defaultGoal>
                 <pluginManagement>
@@ -69,6 +79,10 @@
         </profile>
         <profile>
             <id>release</id>
+            <modules>
+                <module>token-session</module>
+                <module>spring-boot-autoconfigure</module>
+            </modules>
             <build>
                 <plugins>
                     <plugin>

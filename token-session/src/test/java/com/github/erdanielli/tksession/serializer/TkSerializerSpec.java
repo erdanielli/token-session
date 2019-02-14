@@ -29,10 +29,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 /** @author erdanielli */
-abstract class TkSerializerSpec {
+public abstract class TkSerializerSpec {
   private SessionListenerNotifier notifier = new SessionListenerNotifierBuilder().build();
 
-  abstract TkSerializer createTkSerializer();
+  protected abstract TkSerializer createTkSerializer();
 
   @Test
   void shouldSupportNewSessions() {
@@ -57,7 +57,7 @@ abstract class TkSerializerSpec {
     assertThat(actual.attributes()).containsAllEntriesOf(expected.attributes());
   }
 
-  private Session newSession() {
+  protected final Session newSession() {
     return new SpecCompleteSession(mock(ServletContext.class), notifier.observe(new NewSession()));
   }
 
@@ -65,7 +65,7 @@ abstract class TkSerializerSpec {
     assertEquals(writeThenRead(expected), expected);
   }
 
-  private Session writeThenRead(Session session) {
+  protected final Session writeThenRead(Session session) {
     final TkSerializer serializer = createTkSerializer();
     return serializer.read(serializer.write(session));
   }

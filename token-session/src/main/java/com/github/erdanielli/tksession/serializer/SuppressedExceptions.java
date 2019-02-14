@@ -17,10 +17,10 @@ import java.io.*;
 
 /** @author erdanielli */
 @SuppressWarnings("squid:S1610")
-abstract class SuppressedExceptions {
+public abstract class SuppressedExceptions {
 
   @SuppressWarnings("unchecked")
-  static <T> T readObject(ObjectInput input) throws IOException {
+  public static <T> T readObject(ObjectInput input) throws IOException {
     try {
       return (T) input.readObject();
     } catch (ClassNotFoundException e) {
@@ -28,7 +28,7 @@ abstract class SuppressedExceptions {
     }
   }
 
-  static byte[] writeToByteArray(CheckedConsumer cn) {
+  public static byte[] writeToByteArray(CheckedConsumer cn) {
     final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     try (final ObjectOutputStream output = new ObjectOutputStream(bytes)) {
       cn.accept(output);
@@ -42,6 +42,6 @@ abstract class SuppressedExceptions {
 
   @FunctionalInterface
   interface CheckedConsumer {
-    void accept(ObjectOutput output) throws IOException;
+    void accept(ObjectOutputStream output) throws IOException;
   }
 }

@@ -26,7 +26,7 @@ class TkBase64SerializerTest extends TkSerializerSpec {
   private TkBase64Serializer serializer = new TkBase64Serializer(new TkJdkSerializer());
 
   @Override
-  TkSerializer createTkSerializer() {
+  protected TkSerializer createTkSerializer() {
     return serializer;
   }
 

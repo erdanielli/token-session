@@ -17,7 +17,7 @@ package com.github.erdanielli.tksession.serializer;
 class TkJdkSerializerTest extends TkSerializerSpec {
 
   @Override
-  TkSerializer createTkSerializer() {
+  protected TkSerializer createTkSerializer() {
     return new TkJdkSerializer();
   }
 }
